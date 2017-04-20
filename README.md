@@ -17,3 +17,12 @@ This plugin is best played in small maps like demolition or arms race, in classi
 
 ## Features
 
+   * Player chickens
+   * Play chicken sounds
+   * Smokes spawns chickens
+   * Decoy spawns an armed chicken
+   * Chickens can have skins and hats
+   * Spawns defined number of chickens in the map
+   * Blocks players from killing non-player chickens
+   * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
+   * Hide radar to help hiding with chickens

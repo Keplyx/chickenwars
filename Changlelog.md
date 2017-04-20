@@ -10,3 +10,5 @@
   * Blocked crouch (not crouch-jump)
   * Fixed player's chicken animation on spawn
   * Improved chicken spawn (based on world origin not on spawns)
+* **Version 1.0**
+  * Initial release

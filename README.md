@@ -33,7 +33,7 @@ Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugi
 
 ## Cvars
 
-See chickenwars.cfg
+[See chickenwars.cfg](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
 
 ## Commands
 
@@ -53,6 +53,7 @@ See chickenwars.cfg
 ![20170417114936_1](https://cloud.githubusercontent.com/assets/23726131/25240671/bb424ace-25f3-11e7-983b-57f50e1cc7d4.jpg)
 
 ## Changlelog
+
 [See changlelog.md](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
 
 ### Creator: Keplyx

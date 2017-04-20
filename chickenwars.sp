@@ -369,11 +369,17 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	if (!IsPlayerAlive(client_index))
 		return Plugin_Continue;
 	
+	// Disable non-forward movement :3
+	if(vel[1] != 0)
+		vel[1] = 0.0;
+	if(vel[0] < 0)
+		vel[0] = 0.0;
+	
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
-	isMoving[client_index] = ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT));
+	isMoving[client_index] = vel[0] > 0.0;
 	
-	if ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT) || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]))
+	if (isMoving[client_index] || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
 		SetRotationLock(client_index, true);
 	else
 		SetRotationLock(client_index, false);
@@ -411,16 +417,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		//TODO Play taunt sound, cooldown
 	}
 	
-	// Disable non-forward movement :3
-	if(vel[0] < 0.0  || vel[1] != 0.0)
-	{
-		if(vel[0] < 0.0)
-			vel[0] = 0.0;
-		vel[1] = 0.0;
-		return Plugin_Changed;
-	}
-	
-	return Plugin_Continue;
+	return Plugin_Changed;
 }
 
 public void Hook_WeaponSwitchPost(int client_index, int weapon_index)

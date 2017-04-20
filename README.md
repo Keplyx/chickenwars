@@ -29,11 +29,11 @@ This plugin is best played in small maps like demolition or arms race, in classi
 
 ## Installation
 
-Simply download chickenstrike.smx and place it inside "csgo/addons/sourcemod/plugins/"
+Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"
 
 ## Cvars
 
-See chickenstrike.cfg
+See chickenwars.cfg
 
 ## Commands
 

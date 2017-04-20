@@ -144,10 +144,10 @@ public void OnConfigsExecuted()
 
 static void RegisterCommands()
 {
-	RegConsoleCmd("cs_play_sound", PlayRandomChickenSound);
-	RegConsoleCmd("cs_set_skin", SetChickenSkin);
-	RegConsoleCmd("cs_set_hat", SetChickenHat);
-	RegAdminCmd("cs_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
+	RegConsoleCmd("cw_play_sound", PlayRandomChickenSound);
+	RegConsoleCmd("cw_set_skin", SetChickenSkin);
+	RegConsoleCmd("cw_set_hat", SetChickenHat);
+	RegAdminCmd("cw_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
 }
 
 public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags)

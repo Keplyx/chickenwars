@@ -54,13 +54,13 @@ See chickenwars.cfg
 
 ## Changlelog
 
-* Version 1.0.2
+* **Version 1.0.2**
   * Removed grenade sounds
   * Forced new syntax
   * Added use of csgocolors.inc
   * User userid for timers
   * Code Cleanup
-* Version 1.0.1
+* **Version 1.0.1**
   * Added a lock rotation feature
   * Added ability to hide player radar with cvar
   * Blocked crouch (not crouch-jump)

@@ -350,42 +350,46 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 		return Plugin_Handled;
 }
 
-public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon)
+public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	if (IsPlayerAlive(client_index))
+	if (!IsPlayerAlive(client_index))
+		return Plugin_Continue;
+	
+	//Change player's animations based on key pressed
+	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
+	isMoving[client_index] = ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT));
+	
+	if ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT) || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]))
+		SetRotationLock(client_index, true);
+	else
+		SetRotationLock(client_index, false);
+	
+	//Block crouch but not crouch-jump
+	if ((buttons & IN_DUCK) && (GetEntityFlags(client_index) & FL_ONGROUND))
 	{
-		//Change player's animations based on key pressed
-		isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
-		isMoving[client_index] = ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT));
-		
-		if ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT) || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]))
-			SetRotationLock(client_index, true);
-		else
-			SetRotationLock(client_index, false);
-		
-		//Block crouch but not crouch-jump
-		if ((buttons & IN_DUCK) && (GetEntityFlags(client_index) & FL_ONGROUND))
+		buttons &= ~IN_DUCK;
+		return Plugin_Continue;
+	}
+	
+	//Disable knife cuts (client will see impact, but it won't do any damage)
+	if (StrEqual(currentWeaponName[client_index], "knife", false))
+	{
+		if (buttons & IN_ATTACK)
 		{
-			buttons &= ~IN_DUCK;
+			buttons &= ~IN_ATTACK;
 			return Plugin_Continue;
 		}
-		
-		//Disable knife cuts (client will see impact, but it won't do any damage)
-		if (StrEqual(currentWeaponName[client_index], "knife", false))
+		else if (buttons & IN_ATTACK2)
 		{
-			if (buttons & IN_ATTACK)
-			{
-				buttons &= ~IN_ATTACK;
-				return Plugin_Continue;
-			}
-			else if (buttons & IN_ATTACK2)
-			{
-				buttons &= ~IN_ATTACK2;
-				return Plugin_Continue;
-			}
+			buttons &= ~IN_ATTACK2;
+			return Plugin_Continue;
 		}
-		
 	}
+	
+	// Disable non-forward movement :3
+	if( vel[0] < 0.0  || vel[1] != 0.0)
+		return Plugin_Changed;
+	
 	return Plugin_Continue;
 }
 

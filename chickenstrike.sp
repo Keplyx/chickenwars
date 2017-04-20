@@ -19,6 +19,11 @@
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
+
+#include <csgocolors>
+
+#pragma newdecls required;
+
 #include "chickenstrike/chickenplayer.sp"
 #include "chickenstrike/chickenmanager.sp"
 #include "chickenstrike/customweapons.sp"
@@ -39,34 +44,43 @@
 *   Improved chicken spawn (based on world origin not on spawns)
 */
 
+/*  New in version 1.0.2
+*
+*   Removed grenade sounds
+*   Forced new syntax
+*   Added use of csgocolors.inc
+*   User userid for timers
+*   Code Cleanup
+*/
+
 
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
 
 //Best maps: demolition/arms race => Small but no buy zones: Must set mp_buy_anywhere 1
 
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 #define PLUGIN_NAME "Chicken Strike",
 
 #define ENT_RADAR 1 << 12 
 
-new collisionOffsets;
+int collisionOffsets;
 
-new const String:chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
-new const String:chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
+char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
+char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
 
-new Handle:cvar_viewModel = INVALID_HANDLE;
-new Handle:cvar_chicken_kill_limit = INVALID_HANDLE;
-new Handle:cvar_health = INVALID_HANDLE;
-new Handle:cvar_welcome_message = INVALID_HANDLE;
-new Handle:cvar_hideradar = INVALID_HANDLE;
-new Handle:cvar_chicken_number = INVALID_HANDLE;
-new Handle:cvar_spawnorigin = INVALID_HANDLE;
+ConVar cvar_viewModel = null;
+ConVar cvar_chicken_kill_limit = null;
+ConVar cvar_health = null;
+ConVar cvar_welcome_message = null;
+ConVar cvar_hideradar = null;
+ConVar cvar_chicken_number = null;
+ConVar cvar_spawnorigin = null;
 
-new Handle:cvar_hats[6];
+ConVar cvar_hats[6];
 
-new Handle:cvar_skin = INVALID_HANDLE;
-new Handle:cvar_player_styles = INVALID_HANDLE;
+ConVar cvar_skin = null;
+ConVar cvar_player_styles = null;
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
@@ -95,6 +109,8 @@ public void OnPluginStart()
 	collisionOffsets = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
 	InitPlayersStyles();
 	
+	AddNormalSoundHook(NormalSHook);
+	
 	PrintToServer("*************************************");
 	PrintToServer("* Chicken Strike successfuly loaded *");
 	PrintToServer("*************************************");
@@ -102,8 +118,7 @@ public void OnPluginStart()
 
 public void CreateConVars()
 {
-	CreateConVar("chickenstrike_version", VERSION, "Chicken Strike", 
-		FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
+	CreateConVar("chickenstrike_version", VERSION, "Chicken Strike",  FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
 	cvar_viewModel = CreateConVar("cs_viewmodel", "0", "Show view model? 0 = no, 1 = yes", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_chicken_kill_limit = CreateConVar("cs_chickenkill_limit", "1", "How many chickens (npc) the player can kill before being auto killed? 0 = no limit, x = can only kill x before dying", FCVAR_NOTIFY, true, 0.0);
 	cvar_health = CreateConVar("cs_health", "15", "Set player's health. min = 1, max = 30000", FCVAR_NOTIFY, true, 1.0, true, 3000.0);
@@ -145,15 +160,29 @@ static void RegisterCommands()
 	RegAdminCmd("cs_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
 }
 
+public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags)
+{
+	if(IsValidEntity(entity))
+	{
+		char sClassname[64];
+		GetEntityClassname(entity, sClassname, sizeof(sClassname));
+		
+		if(StrContains(sClassname, "_projectile") != -1)
+			return Plugin_Stop;
+	}
+	
+	return Plugin_Continue;
+}
+
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-	new victim = GetClientOfUserId(GetEventInt(event, "userid"));
+	int victim = GetClientOfUserId(GetEventInt(event, "userid"));
 	DisableChicken(victim);
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
-	new client_index = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client_index = GetClientOfUserId(GetEventInt(event, "userid"));
 	//Get player's viewmodel for future hiding
 	clientsViewmodels[client_index] = GetViewModelIndex(client_index);
 	//Set player server sided skins
@@ -166,23 +195,23 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 	//Reset the chicken killed count
 	chickenKilledCounter[client_index] = 0;
 	
-	CreateTimer(0.0, Timer_RemoveRadar, client_index);
+	CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
 }
 
-public void Event_PlayerTeam(Handle:event, const String:name[], bool:dontBroadcast)
+public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
 {
-	new client_index = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client_index = GetClientOfUserId(GetEventInt(event, "userid"));
 	DisableChicken(client_index);
 }
 
-public void Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
+public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	SpawnChickens();
 }
 
 
 
-public void OnClientPostAdminCheck(client_index)
+public void OnClientPostAdminCheck(int client_index)
 {
 	SDKHook(client_index, SDKHook_PostThinkPost, Hook_OnPostThinkPost);
 	SDKHookEx(client_index, SDKHook_WeaponSwitchPost, Hook_WeaponSwitchPost);
@@ -190,7 +219,7 @@ public void OnClientPostAdminCheck(client_index)
 	CreateTimer(3.0, Timer_WelcomeMessage, client_index);
 }
 
-public void OnClientDisconnect(client_index)
+public void OnClientDisconnect(int client_index)
 {
 	DisableChicken(client_index);
 	ResetPlayerStyle(client_index);
@@ -198,28 +227,32 @@ public void OnClientDisconnect(client_index)
 
 public void OnEntityCreated(int entity_index, const char[] classname)
 {
-	SDKHook(entity_index, SDKHook_OnTakeDamage, Hook_TakeDamage);
+	if (StrEqual(classname, "chicken", false))
+	{
+		SDKHook(entity_index, SDKHook_OnTakeDamage, Hook_ChickenTakeDamage);
+	}
 	
 	if (StrEqual(classname, "smokegrenade_projectile", false) || StrEqual(classname, "decoy_projectile"))
 	{
-		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnThinkPost);
+		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
 }
 
 public Action Timer_WelcomeMessage(Handle timer, int client_index)
 {
-	if (IsClientConnected(client_index) && IsClientInGame(client_index) && GetConVarBool(cvar_welcome_message))
+	if (cvar_welcome_message.BoolValue && IsClientConnected(client_index) && IsClientInGame(client_index))
 	{
 		//Welcome message (white text in red box)
-		PrintToChat(client_index, "\x01 \x02********************************");
-		PrintToChat(client_index, "\x01 \x02* \x01Welcome to Chicken Strike");
-		PrintToChat(client_index, "\x01 \x02*            \x01Made by Keplyx");
-		PrintToChat(client_index, "\x01 \x02********************************");
+		CPrintToChat(client_index, "{darkred}********************************");
+		CPrintToChat(client_index, "{darkred}* {default}Welcome to Chicken Strike");
+		CPrintToChat(client_index, "{darkred}*            {default}Made by Keplyx");
+		CPrintToChat(client_index, "{darkred}********************************");
 	}
 }
 
-public Action Timer_RemoveRadar(Handle:timer, any client_index) {
-	if (IsPlayerAlive(client_index) && IsClientInGame(client_index) && GetConVarBool(cvar_hideradar))
+public Action Timer_RemoveRadar(Handle timer, any userid) {
+	int client_index = GetClientOfUserId(userid);
+	if (GetConVarBool(cvar_hideradar) && client_index && IsClientInGame(client_index) && IsPlayerAlive(client_index))
 		SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
 }
 
@@ -326,7 +359,7 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 		return Plugin_Handled;
 }
 
-public Action OnPlayerRunCmd(client_index, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon)
+public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon)
 {
 	if (IsPlayerAlive(client_index))
 	{
@@ -365,7 +398,7 @@ public Action OnPlayerRunCmd(client_index, &buttons, &impulse, Float:vel[3], Flo
 	return Plugin_Continue;
 }
 
-public void Hook_WeaponSwitchPost(client_index, weapon_index)
+public void Hook_WeaponSwitchPost(int client_index, int weapon_index)
 {
 	if (GetEntityRenderMode(client_index) == RENDER_NONE)
 	{
@@ -383,7 +416,7 @@ public void Hook_WeaponSwitchPost(client_index, weapon_index)
 	SDKHook(weapon_index, SDKHook_ReloadPost, Hook_WeaponReloadPost);
 }
 
-public Hook_OnPostThinkPost(entity_index)
+public void Hook_OnPostThinkPost(int entity_index)
 {
 	SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
 	//Update convars for other files
@@ -392,16 +425,16 @@ public Hook_OnPostThinkPost(entity_index)
 	UpdateChickenCvars(cvar_hats, cvar_skin, cvar_chicken_number, cvar_spawnorigin);
 }
 
-public Hook_OnThinkPost(entity_index)
+public void Hook_OnGrenadeThinkPost(int entity_index)
 {
 	//Manage the grenades
 	//When it stops moving, kill the entity and replace it by chickens!
-	new Float:fVelocity[3];
+	float fVelocity[3];
 	GetEntPropVector(entity_index, Prop_Send, "m_vecVelocity", fVelocity);
 	if (fVelocity[0] == 0.0 && fVelocity[1] == 0.0 && fVelocity[2] == 0.0)
 	{
 		int client_index = GetEntPropEnt(entity_index, Prop_Data, "m_hOwnerEntity")
-		new Float:fOrigin[3];
+		float fOrigin[3];
 		GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", fOrigin);
 		
 		char buffer[64];
@@ -415,7 +448,7 @@ public Hook_OnThinkPost(entity_index)
 	}
 }
 
-public bool:TRDontHitSelf(entity, mask, any:data) //Trace hull filter
+public bool TRDontHitSelf(int entity, int mask, any data) //Trace hull filter
 {
 	if (entity == data)return false;
 	return true;
@@ -424,51 +457,46 @@ public bool:TRDontHitSelf(entity, mask, any:data) //Trace hull filter
 
 public Action Hook_WeaponReloadPost(int weapon) //Bug: gets called if ammo is full and player pressing reload key
 {
-	new owner = GetEntPropEnt(weapon, Prop_Send, "m_hOwnerEntity");
+	int owner = GetEntPropEnt(weapon, Prop_Send, "m_hOwnerEntity");
 	//EmitSoundToAll(chickenPanicSounds[0], owner); //Disabled to prevent spam
 	PrintHintText(owner, "<font color='#ff0000' size='30'>RELOADING</font>");
 }
 
-public Action Hook_TakeDamage(entity_index, &attacker, &inflictor, &Float:damage, &damagetype)
+public Action Hook_ChickenTakeDamage(int entity_index, int &attacker, int &inflictor, float &damage, int &damagetype)
 {
 	//Detect if player killed a chicken
 	//Add a kill to the counter and if reached limit, kill the player (also display in chat)
 	if ((entity_index >= 1) && (attacker >= 1) && (attacker <= MaxClients) && (attacker == inflictor))
 	{
-		char buffer[128];
-		GetEdictClassname(entity_index, buffer, sizeof(buffer));
-		if (StrEqual(buffer, "chicken", false))
+		if (chickenKilledCounter[attacker] < GetConVarInt(cvar_chicken_kill_limit) && GetConVarInt(cvar_chicken_kill_limit) != 0)
 		{
-			if (chickenKilledCounter[attacker] < GetConVarInt(cvar_chicken_kill_limit) && GetConVarInt(cvar_chicken_kill_limit) != 0)
-			{
-				chickenKilledCounter[attacker]++;
-				PrintHintText(attacker, "<font color='#ff0000' size='30'>WARNING</font><br><font color='#ff0000' size='20'>Don't kill chicken civilians</font>");
-			}
+			chickenKilledCounter[attacker]++;
+			PrintHintText(attacker, "<font color='#ff0000' size='30'>WARNING</font><br><font color='#ff0000' size='20'>Don't kill chicken civilians</font>");
+		}
+		
+		else if (GetConVarInt(cvar_chicken_kill_limit) != 0)
+		{
+			chickenKilledCounter[attacker] = 0;
+			ForcePlayerSuicide(attacker);
 			
-			else if (GetConVarInt(cvar_chicken_kill_limit) != 0)
+			char buffer[128];
+			GetClientName(attacker, buffer, sizeof(buffer));
+			int rdmChat = GetRandomInt(0, 5);
+			
+			switch(rdmChat)
 			{
-				chickenKilledCounter[attacker] = 0;
-				ForcePlayerSuicide(attacker);
-				GetClientName(attacker, buffer, sizeof(buffer));
-				int rdmChat = GetRandomInt(0, 5);
-				if (rdmChat == 0)
-					PrintToChatAll("\x01 \x02%s \x07gave up on life.", buffer);
-				if (rdmChat == 1)
-					PrintToChatAll("\x01 \x02%s \x07couldn't stand the casualties.", buffer);
-				if (rdmChat == 2)
-					PrintToChatAll("\x01 \x02%s \x07killed too many civilians.", buffer);
-				if (rdmChat == 3)
-					PrintToChatAll("\x01 \x02%s \x07was a monster. Nobody misses him.", buffer);
-				if (rdmChat == 4)
-					PrintToChatAll("\x01 \x02%s \x07lost his honour.", buffer);
-				if (rdmChat == 5)
-					PrintToChatAll("\x01 \x02%s \x07was kicked by the chicken gods.", buffer);
+				case 0: CPrintToChatAll("{yellow}%s {darkred}gave up on life.", buffer);
+				case 1: CPrintToChatAll("{yellow}%s {darkred}couldn't stand the casualties.", buffer);
+				case 2: CPrintToChatAll("{yellow}%s {darkred}killed too many civilians.", buffer);
+				case 3: CPrintToChatAll("{yellow}%s {darkred}was a monster. Nobody misses him.", buffer);
+				case 4: CPrintToChatAll("{yellow}%s {darkred}lost his honour.", buffer);
+				case 5: CPrintToChatAll("{yellow}%s {darkred}was kicked by the chicken gods.", buffer);
 			}
 		}
 	}
 }
 
-public Action:Hook_SetTransmit(entity, client)
+public Action Hook_SetTransmit(int entity, int client)
 {
 	return Plugin_Handled;
 }

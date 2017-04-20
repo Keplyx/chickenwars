@@ -16,9 +16,10 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-new const String:chickenModel[] = "models/chicken/chicken.mdl";
-new const String:chickenDeathSounds[][] =  { "ambient/creatures/chicken_death_01.wav", "ambient/creatures/chicken_death_02.wav", "ambient/creatures/chicken_death_03.wav" }
-new const String:chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUMP", "ACT_GLIDE", "ACT_LAND", "ACT_HOP" }
+char chickenModel[] = "models/chicken/chicken.mdl";
+char chickenDeathSounds[][] =  { "ambient/creatures/chicken_death_01.wav", "ambient/creatures/chicken_death_02.wav", "ambient/creatures/chicken_death_03.wav" }
+char chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUMP", "ACT_GLIDE", "ACT_LAND", "ACT_HOP" }
+
 //new const String:chickenAnim[][] =  { "ref", "walk01", "run01", "run01Flap", "idle01", "peck_idle2", "flap", "flap_falling", "bounce", "bunnyhop" }
 //Use sequences (better than animations)
 
@@ -26,11 +27,11 @@ new const String:chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUM
 int chickens[MAXPLAYERS + 1];
 
 //Timers
-Handle:animationsTimer[MAXPLAYERS + 1];
-Handle:feathersTimer[MAXPLAYERS + 1];
+Handle animationsTimer[MAXPLAYERS + 1];
+Handle feathersTimer[MAXPLAYERS + 1];
 
-new feathersParticles[MAXPLAYERS + 1];
-new lastFlags[MAXPLAYERS + 1];
+int feathersParticles[MAXPLAYERS + 1];
+int lastFlags[MAXPLAYERS + 1];
 
 //Animation related variables
 bool wasIdle[MAXPLAYERS + 1] = false;
@@ -55,12 +56,12 @@ const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)
 const float chickenWalkSpeed = 0.12;
 const float chickenPosOffset = 64.0;
 
-public OnMapStart()
+public void OnMapStart()
 {
 	PrecacheModel(chickenModel, true); //Make sure the model is precached to prevent crash
 }
 
-public void InitPlayersStyles() //Set skins/hats to server sided for everyone
+void InitPlayersStyles() //Set skins/hats to server sided for everyone
 {
 	for (int i = 0; i <= MAXPLAYERS; i++)
 	{
@@ -69,18 +70,16 @@ public void InitPlayersStyles() //Set skins/hats to server sided for everyone
 	}
 }
 
-public void ResetPlayerStyle(client_index) //Set a player's skin/hat to server sided
+void ResetPlayerStyle(int client_index) //Set a player's skin/hat to server sided
 {
 	playerHat[client_index] = -1;
 	playerSkin[client_index] = -1;
 }
 
-public void SetChicken(client_index)
+void SetChicken(int client_index)
 {
 	//Delete fake model to prevent glitches
 	DisableFakeModel(client_index);
-	
-	//PrintToChat(client_index, "\x01 \x04You are a Chicken!!");
 	
 	//Only for hitbox -> Collision hull still the same
 	SetEntityModel(client_index, chickenModel);
@@ -95,7 +94,7 @@ public void SetChicken(client_index)
 	CreateFakeModel(client_index);
 }
 
-public void CreateFakeModel(client_index)
+void CreateFakeModel(int client_index)
 {
 	chickens[client_index] = CreateEntityByName("prop_dynamic_override");
 	if (IsValidEntity(chickens[client_index])) {
@@ -129,11 +128,25 @@ public void CreateFakeModel(client_index)
 		//Sets the base animation (to spawn with)
 		SetVariantString(chickenSec[2]); AcceptEntityInput(chickens[client_index], "SetAnimation");
 		//Plays the animation
-		animationsTimer[client_index] = CreateTimer(0.1, Timer_ChickenAnim, client_index, TIMER_REPEAT);
+		animationsTimer[client_index] = CreateTimer(0.1, Timer_ChickenAnim, GetClientUserId(client_index), TIMER_REPEAT);
+		
+		
+		// Chicken cam
+		char sTargetName[64]; 
+		Format(sTargetName, sizeof(sTargetName), "chicken_%d", client_index);
+		DispatchKeyValue(chickens[client_index], "targetname", sTargetName);
+		
+		SetVariantString(sTargetName);
+		AcceptEntityInput(chickens[client_index], "SetParent", chickens[client_index], chickens[client_index], 0);
+		
+		//SetVariantString("facemask");
+		//AcceptEntityInput(chickens[client_index], "SetParentAttachment", chickens[client_index], chickens[client_index], 0);
+		
+		SetClientViewEntity(client_index, chickens[client_index]);
 	}
 }
 
-public void DisableChicken(client_index)
+void DisableChicken(int client_index)
 {
 	//Reset player's properties, stop animations
 	SetClientSpeed(client_index, 1.0);
@@ -154,7 +167,7 @@ public void DisableChicken(client_index)
 	ChickenDeath(client_index);
 }
 
-public void DisableFakeModel(client_index)
+void DisableFakeModel(int client_index)
 {
 	if (chickens[client_index] != 0 && IsValidEdict(chickens[client_index]))
 	{
@@ -163,7 +176,7 @@ public void DisableFakeModel(client_index)
 	}
 }
 
-public void ChickenDeath(client_index) //Fake a chicken's death
+void ChickenDeath(int client_index) //Fake a chicken's death
 {
 	//Sound
 	int rdmSound = GetRandomInt(0, 2);
@@ -184,7 +197,7 @@ public void ChickenDeath(client_index) //Fake a chicken's death
 	feathersTimer[client_index] = CreateTimer(3.0, Timer_DestroyParticles, client_index);
 }
 
-public void SetRotationLock(client_index, bool enabled)
+void SetRotationLock(int client_index, bool enabled)
 {
     float nullRot[3];
     float pos[3];
@@ -205,16 +218,17 @@ public void SetRotationLock(client_index, bool enabled)
     }
 } 
 
-public SetClientSpeed(client_index, float speed)
+void SetClientSpeed(int client_index, float speed)
 {
 	SetEntPropFloat(client_index, Prop_Send, "m_flLaggedMovementValue", speed); //reduce player's speed (including falling speed)
 }
 
-public Action Timer_ChickenAnim(Handle timer, client_index) //Must reset falling anim each 1s (doesn't loop)
+public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling anim each 1s (doesn't loop)
 {
-	if (IsClientInGame(client_index))
+	int client_index = GetClientOfUserId(userid);
+	if (client_index && IsClientInGame(client_index))
 	{
-		new currentFlags = GetEntityFlags(client_index);
+		int currentFlags = GetEntityFlags(client_index);
 		
 		//If client started fly, change his animation (falling), or set it back if 1s passed
 		if (!(currentFlags & FL_ONGROUND) && flyCounter[client_index] == 0)
@@ -271,11 +285,12 @@ public Action Timer_ChickenAnim(Handle timer, client_index) //Must reset falling
 		}
 		lastFlags[client_index] = currentFlags;
 	}
-	
 }
 
-public Action Timer_DestroyParticles(Handle timer, client_index)
+public Action Timer_DestroyParticles(Handle timer, int client_index)
 {
-	if (IsValidEdict(feathersParticles[client_index]))
+	if (feathersTimer[client_index] == timer && IsValidEdict(feathersParticles[client_index]))
 		RemoveEdict(feathersParticles[client_index]);
+	
+	return Plugin_Handled;
 } 

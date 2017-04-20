@@ -18,9 +18,9 @@
 
 int weapons[MAXPLAYERS];
 int clientsViewmodels[MAXPLAYERS + 1];
-String:currentWeaponName[MAXPLAYERS + 1][32];
+char currentWeaponName[MAXPLAYERS + 1][32];
 
-public void DisplaySwitching(client_index)
+public void DisplaySwitching(int client_index)
 {
 	if (StrEqual(currentWeaponName[client_index], "knife", false))
 	{
@@ -37,10 +37,10 @@ public void DisplaySwitching(client_index)
 }
 
 
-public void CreateFakeWeapon(client_index, weapon_index)
+public void CreateFakeWeapon(int client_index, int weapon_index)
 {
 	DeleteFakeWeapon(client_index);
-	new String:weapon_name[32];
+	char weapon_name[32];
 	GetEdictClassname(weapon_index, weapon_name, sizeof weapon_name);
 	
 	if (!StrEqual(weapon_name, "weapon_knife", false))
@@ -48,7 +48,7 @@ public void CreateFakeWeapon(client_index, weapon_index)
 		weapons[client_index] = CreateEntityByName("prop_dynamic_override");
 		if (IsValidEntity(weapons[client_index]))
 		{
-			new String:modelName[128];
+			char modelName[128];
 			GetEntPropString(weapon_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
 			SetEntityModel(weapons[client_index], modelName);
 			
@@ -67,7 +67,7 @@ public void CreateFakeWeapon(client_index, weapon_index)
 	}
 }
 
-public void DeleteFakeWeapon(client_index)
+public void DeleteFakeWeapon(int client_index)
 {
 	if (IsValidEntity(weapons[client_index]) && weapons[client_index] > MAXPLAYERS)
 	{
@@ -76,7 +76,7 @@ public void DeleteFakeWeapon(client_index)
 	}
 }
 
-public void SetWeaponVisibility(client_index, weapon, bool enabled)
+public void SetWeaponVisibility(int client_index, int weapon, bool enabled)
 {
 	if (weapon != -1)
 	{
@@ -92,7 +92,7 @@ public void SetWeaponVisibility(client_index, weapon, bool enabled)
 	}
 }
 
-public int GetViewModelIndex(client_index)
+public int GetViewModelIndex(int client_index)
 {
 	int index = MAXPLAYERS;
 	while ((index = FindEntityByClassname(index, "predicted_viewmodel")) != -1)
@@ -107,18 +107,18 @@ public int GetViewModelIndex(client_index)
 	return -1;
 }
 
-public void GetCurrentWeaponName(client_index, weapon_index)
+public void GetCurrentWeaponName(int client_index, int weapon_index)
 {
 	//Simply removes weapon prefix from the classname
-	new String:weaponName[32];
+	char weaponName[32];
 	GetEdictClassname(weapon_index, weaponName, sizeof weaponName);
 	ReplaceString(weaponName, sizeof weaponName, "weapon_", "");
 	currentWeaponName[client_index] = weaponName;
 }
 
-public void SetViewModel(client_index, bool enabled)
+public void SetViewModel(int client_index, bool enabled)
 {
-	new EntEffects = GetEntProp(clientsViewmodels[client_index], Prop_Send, "m_fEffects");
+	int EntEffects = GetEntProp(clientsViewmodels[client_index], Prop_Send, "m_fEffects");
 	if (enabled)
 		EntEffects |= ~32;
 	else
@@ -126,11 +126,11 @@ public void SetViewModel(client_index, bool enabled)
 	SetEntProp(clientsViewmodels[client_index], Prop_Send, "m_fEffects", EntEffects);
 }
 
-public void RemovePlayerWeapons(client_index)
+public void RemovePlayerWeapons(int client_index)
 {
 	int weaponIndex;
 	//Cycles through every slot and deletes the weapons
-	for (new i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++) {
 		if (GetPlayerWeaponSlot(client_index, i) != -1) {
 			weaponIndex = GetPlayerWeaponSlot(client_index, i);
 			RemovePlayerItem(client_index, weaponIndex);

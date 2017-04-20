@@ -21,7 +21,7 @@ int chickenSkin = 0;
 int chickenNumber = 0;
 bool spawnOrigin = true;
 
-public void UpdateChickenCvars(Handle:hats[6], Handle:skins, Handle:chickenNum, Handle:spawn)
+public void UpdateChickenCvars(Handle hats[6], Handle skins, Handle chickenNum, Handle spawn)
 {
 	//get cvars from main file
 	for (int i = 0; i < sizeof(hats); i++)
@@ -80,7 +80,7 @@ public int CreateChickenRandom(float origin[3])
 	float boxMax[3] =  { 16.0, 16.0, 16.0 };
 	//PrintToChatAll("Trying to create chicken%i", entitySpawnCounter);
 	
-	new entity = CreateEntityByName("chicken");
+	int entity = CreateEntityByName("chicken");
 	if (IsValidEntity(entity))
 	{
 		SetChickenStyle(entity); //Set the hat/skin
@@ -114,7 +114,7 @@ public int CreateChickenRandom(float origin[3])
 public void RemoveChickens()
 {
 	char className[64];
-	for (new i = MaxClients; i < GetMaxEntities(); i++)
+	for (int i = MaxClients; i < GetMaxEntities(); i++)
 	{
 		if (IsValidEntity(i) && IsValidEdict(i))
 		{
@@ -125,7 +125,7 @@ public void RemoveChickens()
 	}
 }
 
-public void SetChickenStyle(chicken)
+public void SetChickenStyle(int chicken)
 {
 	SetEntProp(chicken, Prop_Send, "m_nSkin", GetChickenSkin()); //0=normal 1=brown chicken
 	SetEntProp(chicken, Prop_Send, "m_nBody", GetChickenHat()); //0=normal 1=BdayHat 2=ghost 3=XmasSweater 4=bunnyEars 5=pumpkinHead

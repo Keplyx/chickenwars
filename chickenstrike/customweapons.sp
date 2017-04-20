@@ -16,9 +16,9 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-public void ChickenDecoy(client_index, float pos[3], currentWeapon) //Change grenade into an armed chicken!!!!!!!
+public void ChickenDecoy(int client_index, float pos[3], int currentWeapon) //Change grenade into an armed chicken!!!!!!!
 {
-	new entity = CreateEntityByName("chicken");
+	int entity = CreateEntityByName("chicken");
 	if (IsValidEntity(entity))
 	{
 		SetChickenStyle(entity); //Hats!
@@ -29,7 +29,7 @@ public void ChickenDecoy(client_index, float pos[3], currentWeapon) //Change gre
 		DispatchSpawn(entity);
 		ActivateEntity(entity);
 		
-		new weapon = CreateEntityByName("prop_dynamic_override");
+		int weapon = CreateEntityByName("prop_dynamic_override");
 		if (IsValidEntity(weapon) && currentWeapon > MAXPLAYERS)
 		{
 			//Get the player's current gun
@@ -60,7 +60,7 @@ public void ChickenSmoke(float pos[3]) //Change grenade into a lot of chickens!!
 	//Try to spawn 20 chickens
 	for (int i = 0; i < 20; i++)
 	{
-		new entity = CreateEntityByName("chicken");
+		int entity = CreateEntityByName("chicken");
 		if (IsValidEntity(entity))
 		{
 			SetChickenStyle(entity); //Hats!

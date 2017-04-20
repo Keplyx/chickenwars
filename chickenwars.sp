@@ -385,6 +385,20 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		}
 	}
 	
+	// Commands
+	if (buttons & IN_BACK)
+	{
+		//TODO open shop menu, cooldown
+	}
+	else if (buttons & IN_MOVELEFT)
+	{
+		//TODO ??? free ???, cooldown
+	}
+	else if (buttons & IN_MOVERIGHT)
+	{
+		//TODO Play taunt sound, cooldown
+	}
+	
 	// Disable non-forward movement :3
 	if(vel[0] < 0.0  || vel[1] != 0.0)
 	{

@@ -25,7 +25,7 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
 
-### See the wiki for more info
+### [See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
 
 ## Installation
 

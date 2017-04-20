@@ -35,15 +35,6 @@
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
 */
 
-/*  New in version 1.0.1
-*
-*   Added a lock rotation feature
-*   Added ability to hide player radar with cvar
-*   Blocked crouch (not crouch-jump)
-*   Fixed player's chicken animation on spawn
-*   Improved chicken spawn (based on world origin not on spawns)
-*/
-
 /*  New in version 1.0.2
 *
 *   Removed grenade sounds
@@ -87,10 +78,10 @@ int chickenKilledCounter[MAXPLAYERS + 1];
 public Plugin myinfo = 
 {
 	name = PLUGIN_NAME
-	author = "Keplyx & Zipcore", 
-	description = "Counter Wars, but chickens only.", 
+	author = "Keplyx", 
+	description = "Counter Strike, but chickens only.", 
 	version = VERSION, 
-	url = "https://forums.alliedmods.net/showthread.php?t=296290"
+	url = "https://github.com/Keplyx/chickenwars"
 }
 
 public void OnPluginStart()
@@ -111,14 +102,14 @@ public void OnPluginStart()
 	
 	AddNormalSoundHook(NormalSHook);
 	
-	PrintToServer("*************************************");
+	PrintToServer("***********************************");
 	PrintToServer("* Chicken Wars successfuly loaded *");
-	PrintToServer("*************************************");
+	PrintToServer("***********************************");
 }
 
 public void CreateConVars()
 {
-	CreateConVar("chickenwars_version", VERSION, "Chicken Wars Version",  FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
+	CreateConVar("chickenstrike_version", VERSION, "Chicken Strike",  FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
 	cvar_viewModel = CreateConVar("cs_viewmodel", "0", "Show view model? 0 = no, 1 = yes", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_chicken_kill_limit = CreateConVar("cs_chickenkill_limit", "1", "How many chickens (npc) the player can kill before being auto killed? 0 = no limit, x = can only kill x before dying", FCVAR_NOTIFY, true, 0.0);
 	cvar_health = CreateConVar("cs_health", "15", "Set player's health. min = 1, max = 30000", FCVAR_NOTIFY, true, 1.0, true, 3000.0);
@@ -279,7 +270,7 @@ public Action StripWeapons(int client_index, int args) //Set a player defense le
 {
 	if (args < 1)
 	{
-		PrintToConsole(client_index, "Usage: chkn_strip_weapons <name>");
+		PrintToConsole(client_index, "Usage: cs_strip_weapons <name>");
 		return Plugin_Handled;
 	}
 	
@@ -317,7 +308,7 @@ public Action SetChickenSkin(int client_index, int args) //Set player skin if au
 {
 	if (args < 1)
 	{
-		PrintToConsole(client_index, "Usage: chkn_set_skin <skin_number> | Values: -1 = server selected, 0 = white, 1 = brown");
+		PrintToConsole(client_index, "Usage: cs_set_skin <skin_number> | Values: -1 = server selected, 0 = white, 1 = brown");
 		return Plugin_Handled;
 	}
 	
@@ -340,7 +331,7 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 {
 	if (args < 1)
 	{
-		PrintToConsole(client_index, "Usage: chkn_set_hat <hat_number> | Values: -1 = server selected, 0 = no hat, 1 = Bday hat, 2 = ghost hat, 3 = Xmas sweater, 4 = bunny ears, 5 = pumpkin head");
+		PrintToConsole(client_index, "Usage: cs_set_hat <hat_number> | Values: -1 = server selected, 0 = no hat, 1 = Bday hat, 2 = ghost hat, 3 = Xmas sweater, 4 = bunny ears, 5 = pumpkin head");
 		return Plugin_Handled;
 	}
 	

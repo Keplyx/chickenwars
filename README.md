@@ -55,12 +55,11 @@ See chickenwars.cfg
 ## Changlelog
 
 * Version 1.0.1
-
-    Added a lock rotation feature
-    Added ability to hide player radar with cvar
-    Blocked crouch (not crouch-jump)
-    Fixed player's chicken animation on spawn
-    Improved chicken spawn (based on world origin not on spawns)
+  * Added a lock rotation feature
+  * Added ability to hide player radar with cvar
+  * Blocked crouch (not crouch-jump)
+  * Fixed player's chicken animation on spawn
+  * Improved chicken spawn (based on world origin not on spawns)
 
 
 ### Creator: Keplyx

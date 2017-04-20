@@ -91,7 +91,6 @@ public void OnPluginStart()
 	HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("round_start", Event_RoundStart);
 	
-	SetConvars();
 	CreateConVars();
 	RegisterCommands();
 	
@@ -129,7 +128,7 @@ public void CreateConVars()
 	AutoExecConfig(true, "chickenwars");
 }
 
-public void SetConvars()
+public void OnConfigsExecuted()
 {
 	//Set team names
 	SetConVarString(FindConVar("mp_teamname_1"), "Guardian Chickens");

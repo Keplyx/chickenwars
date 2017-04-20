@@ -24,10 +24,10 @@
 
 #pragma newdecls required;
 
-#include "chickenstrike/chickenplayer.sp"
-#include "chickenstrike/chickenmanager.sp"
-#include "chickenstrike/customweapons.sp"
-#include "chickenstrike/weapons.sp"
+#include "chickenwars/chickenplayer.sp"
+#include "chickenwars/chickenmanager.sp"
+#include "chickenwars/customweapons.sp"
+#include "chickenwars/weapons.sp"
 
 /*  BUGS
 *
@@ -60,7 +60,7 @@
 
 
 #define VERSION "1.0.2"
-#define PLUGIN_NAME "Chicken Strike",
+#define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12 
 
@@ -87,8 +87,8 @@ int chickenKilledCounter[MAXPLAYERS + 1];
 public Plugin myinfo = 
 {
 	name = PLUGIN_NAME
-	author = "Keplyx", 
-	description = "Counter Strike, but chickens only.", 
+	author = "Keplyx & Zipcore", 
+	description = "Counter Wars, but chickens only.", 
 	version = VERSION, 
 	url = "https://forums.alliedmods.net/showthread.php?t=296290"
 }
@@ -112,13 +112,13 @@ public void OnPluginStart()
 	AddNormalSoundHook(NormalSHook);
 	
 	PrintToServer("*************************************");
-	PrintToServer("* Chicken Strike successfuly loaded *");
+	PrintToServer("* Chicken Wars successfuly loaded *");
 	PrintToServer("*************************************");
 }
 
 public void CreateConVars()
 {
-	CreateConVar("chickenstrike_version", VERSION, "Chicken Strike",  FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
+	CreateConVar("chickenwars_version", VERSION, "Chicken Wars Version",  FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
 	cvar_viewModel = CreateConVar("cs_viewmodel", "0", "Show view model? 0 = no, 1 = yes", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_chicken_kill_limit = CreateConVar("cs_chickenkill_limit", "1", "How many chickens (npc) the player can kill before being auto killed? 0 = no limit, x = can only kill x before dying", FCVAR_NOTIFY, true, 0.0);
 	cvar_health = CreateConVar("cs_health", "15", "Set player's health. min = 1, max = 30000", FCVAR_NOTIFY, true, 1.0, true, 3000.0);
@@ -135,7 +135,7 @@ public void CreateConVars()
 	cvar_hats[5] = CreateConVar("cs_pumpkin_hat", "0", "Set if chickens can wear a pumpkin head. 0 = no, 1 = yes", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_skin = CreateConVar("cs_skin", "0", "Set the chicken's skin. 0 = white, 1 = brown, 2 = both", FCVAR_NOTIFY, true, 0.0, true, 2.0);
 	cvar_player_styles = CreateConVar("cs_playerstyles", "0", "Set whether players can choose hats and skins. 0 = no, 1 = yes", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	AutoExecConfig(true, "chickenstrike");
+	AutoExecConfig(true, "chickenwars");
 }
 
 public void SetConvars()
@@ -244,7 +244,7 @@ public Action Timer_WelcomeMessage(Handle timer, int client_index)
 	{
 		//Welcome message (white text in red box)
 		CPrintToChat(client_index, "{darkred}********************************");
-		CPrintToChat(client_index, "{darkred}* {default}Welcome to Chicken Strike");
+		CPrintToChat(client_index, "{darkred}* {default}Welcome to Chicken Wars");
 		CPrintToChat(client_index, "{darkred}*            {default}Made by Keplyx");
 		CPrintToChat(client_index, "{darkred}********************************");
 	}

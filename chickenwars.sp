@@ -49,7 +49,7 @@ if(IsClientInGame(%1) && !IsFakeClient(%1))
 if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12 

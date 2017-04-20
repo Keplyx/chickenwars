@@ -1,4 +1,4 @@
-# Chicken Wars 1.0.2
+# Chicken Wars 1.0.3
 Counter Strike, but chickens only.
 
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.
@@ -19,6 +19,7 @@ This plugin is best played in small maps like demolition or arms race, in classi
 
    * Player chickens
    * Play chicken sounds
+   * Move forward only (chickens don't walk backwards or sideways)
    * Smokes spawns chickens
    * Decoy spawns an armed chicken
    * Chickens can have skins and hats

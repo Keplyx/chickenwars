@@ -35,19 +35,18 @@
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
 */
 
-/*  New in version 1.0.2
-*
-*   Removed grenade sounds
-*   Forced new syntax
-*   Added use of csgocolors.inc
-*   User userid for timers
-*   Code Cleanup
-*/
-
-
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
 
-//Best maps: demolition/arms race => Small but no buy zones: Must set mp_buy_anywhere 1
+#define LoopClients(%1) for(int %1 = 1; %1 <= MaxClients; %1++)
+
+#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1))
+
+#define LoopIngamePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1) && !IsFakeClient(%1))
+
+#define LoopAlivePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
 
 #define VERSION "1.0.2"

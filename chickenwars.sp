@@ -387,8 +387,13 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	}
 	
 	// Disable non-forward movement :3
-	if( vel[0] < 0.0  || vel[1] != 0.0)
+	if(vel[0] < 0.0  || vel[1] != 0.0)
+	{
+		if(vel[0] < 0.0)
+			vel[0] = 0.0;
+		vel[1] = 0.0;
 		return Plugin_Changed;
+	}
 	
 	return Plugin_Continue;
 }

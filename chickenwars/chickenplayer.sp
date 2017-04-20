@@ -129,20 +129,6 @@ void CreateFakeModel(int client_index)
 		SetVariantString(chickenSec[2]); AcceptEntityInput(chickens[client_index], "SetAnimation");
 		//Plays the animation
 		animationsTimer[client_index] = CreateTimer(0.1, Timer_ChickenAnim, GetClientUserId(client_index), TIMER_REPEAT);
-		
-		
-		// Chicken cam
-		char sTargetName[64]; 
-		Format(sTargetName, sizeof(sTargetName), "chicken_%d", client_index);
-		DispatchKeyValue(chickens[client_index], "targetname", sTargetName);
-		
-		SetVariantString(sTargetName);
-		AcceptEntityInput(chickens[client_index], "SetParent", chickens[client_index], chickens[client_index], 0);
-		
-		//SetVariantString("facemask");
-		//AcceptEntityInput(chickens[client_index], "SetParentAttachment", chickens[client_index], chickens[client_index], 0);
-		
-		SetClientViewEntity(client_index, chickens[client_index]);
 	}
 }
 

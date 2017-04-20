@@ -36,14 +36,14 @@ Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugi
 
 ## Commands
 
-    "cs_play_sound" (Play a sound based on player movement: idle if walking or idle, panic if running)
+    "cw_play_sound" (Play a sound based on player movement: idle if walking or idle, panic if running)
 
     If cs_playerstyles "1", players can use:
-    "cs_set_skin" (Set player skin)
-    "cs_set_hat" (Set player hat)
+    "cw_set_skin" (Set player skin)
+    "cw_set_hat" (Set player hat)
 
     Admin only:
-    "cs_strip_weapons" (Removes all weapons from a specific player)
+    "cw_strip_weapons" (Removes all weapons from a specific player)
 
 ## Media
 

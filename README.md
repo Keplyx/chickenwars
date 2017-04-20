@@ -31,9 +31,7 @@ This plugin is best played in small maps like demolition or arms race, in classi
 
 Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"
 
-## Cvars
-
-[See chickenwars.cfg](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
+## [Cvars](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
 
 ## Commands
 
@@ -52,9 +50,7 @@ Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugi
 ![20170417114627_1](https://cloud.githubusercontent.com/assets/23726131/25240660/b1216458-25f3-11e7-8159-e830601399e7.jpg)
 ![20170417114936_1](https://cloud.githubusercontent.com/assets/23726131/25240671/bb424ace-25f3-11e7-983b-57f50e1cc7d4.jpg)
 
-## Changlelog
-
-[See changlelog.md](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
+## [Changlelog](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
 
 ### Creator: Keplyx
 ### Current developers: Keplyx, Zipcore

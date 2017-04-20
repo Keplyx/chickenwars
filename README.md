@@ -13,6 +13,8 @@ If the server operator enables it with a cvar, players can choose their own skin
 
 This plugin is best played in small maps like demolition or arms race, in classic casual or competitive. If you play on these maps, don't forget to set mp_buy_anywhere 1, because they do not have buy-zones. You can also make your own map!
 
+### [See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
+
 ## Features
 
    * Player chickens
@@ -24,8 +26,6 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Blocks players from killing non-player chickens
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
-
-### [See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
 
 ## Installation
 

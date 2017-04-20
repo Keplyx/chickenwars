@@ -19,7 +19,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
-
+#include <cstrike>
 #include <csgocolors>
 
 #pragma newdecls required;
@@ -35,19 +35,18 @@
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
 */
 
-/*  New in version 1.0.2
-*
-*   Removed grenade sounds
-*   Forced new syntax
-*   Added use of csgocolors.inc
-*   User userid for timers
-*   Code Cleanup
-*/
-
-
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
 
-//Best maps: demolition/arms race => Small but no buy zones: Must set mp_buy_anywhere 1
+#define LoopClients(%1) for(int %1 = 1; %1 <= MaxClients; %1++)
+
+#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1))
+
+#define LoopIngamePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1) && !IsFakeClient(%1))
+
+#define LoopAlivePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
+if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
 
 #define VERSION "1.0.2"
@@ -75,6 +74,8 @@ ConVar cvar_player_styles = null;
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
+bool lateload;
+
 public Plugin myinfo = 
 {
 	name = PLUGIN_NAME
@@ -84,6 +85,13 @@ public Plugin myinfo =
 	url = "https://github.com/Keplyx/chickenwars"
 }
 
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	lateload = late;
+	
+	return APLRes_Success;
+}
+
 public void OnPluginStart()
 {
 	HookEvent("player_death", Event_PlayerDeath);
@@ -91,7 +99,6 @@ public void OnPluginStart()
 	HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("round_start", Event_RoundStart);
 	
-	SetConvars();
 	CreateConVars();
 	RegisterCommands();
 	
@@ -101,6 +108,12 @@ public void OnPluginStart()
 	InitPlayersStyles();
 	
 	AddNormalSoundHook(NormalSHook);
+	
+	LoopIngameClients(i)
+		OnClientPostAdminCheck(i);
+	
+	if(lateload)
+		ServerCommand("mp_restartgame 1");
 	
 	PrintToServer("***********************************");
 	PrintToServer("* Chicken Wars successfuly loaded *");
@@ -129,7 +142,7 @@ public void CreateConVars()
 	AutoExecConfig(true, "chickenwars");
 }
 
-public void SetConvars()
+public void OnConfigsExecuted()
 {
 	//Set team names
 	SetConVarString(FindConVar("mp_teamname_1"), "Guardian Chickens");
@@ -137,18 +150,21 @@ public void SetConvars()
 	
 	//Enable hiding of players
 	SetConVarBool(FindConVar("sv_disable_immunity_alpha"), true);
+	
 	//Disable footsteps
 	SetConVarFloat(FindConVar("sv_footstep_sound_frequency"), 500.0);
+	
 	//Disable the event if any (easter, halloween, xmas...)
 	SetConVarBool(FindConVar("sv_holiday_mode"), false);
+	SetConVarBool(FindConVar("mp_buy_anywhere"), true);
 }
 
 static void RegisterCommands()
 {
-	RegConsoleCmd("cs_play_sound", PlayRandomChickenSound);
-	RegConsoleCmd("cs_set_skin", SetChickenSkin);
-	RegConsoleCmd("cs_set_hat", SetChickenHat);
-	RegAdminCmd("cs_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
+	RegConsoleCmd("cw_play_sound", PlayRandomChickenSound);
+	RegConsoleCmd("cw_set_skin", SetChickenSkin);
+	RegConsoleCmd("cw_set_hat", SetChickenHat);
+	RegAdminCmd("cw_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
 }
 
 public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags)
@@ -199,8 +215,6 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 {
 	SpawnChickens();
 }
-
-
 
 public void OnClientPostAdminCheck(int client_index)
 {
@@ -350,43 +364,60 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 		return Plugin_Handled;
 }
 
-public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon)
+public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	if (IsPlayerAlive(client_index))
+	if (!IsPlayerAlive(client_index))
+		return Plugin_Continue;
+	
+	// Disable non-forward movement :3
+	if(vel[1] != 0)
+		vel[1] = 0.0;
+	if(vel[0] < 0)
+		vel[0] = 0.0;
+	
+	//Change player's animations based on key pressed
+	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
+	isMoving[client_index] = vel[0] > 0.0;
+	
+	if (isMoving[client_index] || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
+		SetRotationLock(client_index, true);
+	else
+		SetRotationLock(client_index, false);
+	
+	//Block crouch but not crouch-jump
+	if ((buttons & IN_DUCK) && (GetEntityFlags(client_index) & FL_ONGROUND))
 	{
-		//Change player's animations based on key pressed
-		isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
-		isMoving[client_index] = ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT));
-		
-		if ((buttons & IN_FORWARD) || (buttons & IN_BACK) || (buttons & IN_MOVERIGHT) || (buttons & IN_MOVELEFT) || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]))
-			SetRotationLock(client_index, true);
-		else
-			SetRotationLock(client_index, false);
-		
-		//Block crouch but not crouch-jump
-		if ((buttons & IN_DUCK) && (GetEntityFlags(client_index) & FL_ONGROUND))
-		{
-			buttons &= ~IN_DUCK;
-			return Plugin_Continue;
-		}
-		
-		//Disable knife cuts (client will see impact, but it won't do any damage)
-		if (StrEqual(currentWeaponName[client_index], "knife", false))
-		{
-			if (buttons & IN_ATTACK)
-			{
-				buttons &= ~IN_ATTACK;
-				return Plugin_Continue;
-			}
-			else if (buttons & IN_ATTACK2)
-			{
-				buttons &= ~IN_ATTACK2;
-				return Plugin_Continue;
-			}
-		}
-		
+		buttons &= ~IN_DUCK;
+		return Plugin_Continue;
 	}
-	return Plugin_Continue;
+	
+	//Disable knife cuts (client will see impact, but it won't do any damage)
+	if (StrEqual(currentWeaponName[client_index], "knife", false))
+	{
+		float fUnlockTime = GetGameTime() + 1.0;
+		
+		SetEntPropFloat(client_index, Prop_Send, "m_flNextAttack", fUnlockTime);
+		
+		int knife = GetPlayerWeaponSlot(client_index, CS_SLOT_KNIFE)
+		if(knife > 0)
+			SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
+	}
+	
+	// Commands
+	if (buttons & IN_BACK)
+	{
+		//TODO open shop menu, cooldown
+	}
+	else if (buttons & IN_MOVELEFT)
+	{
+		//TODO ??? free ???, cooldown
+	}
+	else if (buttons & IN_MOVERIGHT)
+	{
+		//TODO Play taunt sound, cooldown
+	}
+	
+	return Plugin_Changed;
 }
 
 public void Hook_WeaponSwitchPost(int client_index, int weapon_index)

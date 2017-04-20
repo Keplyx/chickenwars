@@ -1,8 +1,6 @@
 # chickenwars
 Counter Strike, but chickens only.
 
-
-
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.
 The goal is simply to kill the enemy team, but as you have very little health and are too slow to evade fire, you must hide with normal chickens scattered across the map.
 
@@ -26,6 +24,8 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Blocks players from killing non-player chickens
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
+
+### See the wiki for more info
 
 ## Installation
 

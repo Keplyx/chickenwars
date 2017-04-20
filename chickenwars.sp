@@ -74,6 +74,8 @@ ConVar cvar_player_styles = null;
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
+bool lateload;
+
 public Plugin myinfo = 
 {
 	name = PLUGIN_NAME
@@ -81,6 +83,13 @@ public Plugin myinfo =
 	description = "Counter Strike, but chickens only.", 
 	version = VERSION, 
 	url = "https://github.com/Keplyx/chickenwars"
+}
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	lateload = late;
+	
+	return APLRes_Success;
 }
 
 public void OnPluginStart()
@@ -99,6 +108,12 @@ public void OnPluginStart()
 	InitPlayersStyles();
 	
 	AddNormalSoundHook(NormalSHook);
+	
+	LoopIngameClients(i)
+		OnClientPostAdminCheck(i);
+	
+	if(lateload)
+		ServerCommand("mp_restartgame 1");
 	
 	PrintToServer("***********************************");
 	PrintToServer("* Chicken Wars successfuly loaded *");

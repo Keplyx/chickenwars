@@ -19,7 +19,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
-
+#include <cstrike>
 #include <csgocolors>
 
 #pragma newdecls required;
@@ -373,16 +373,13 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	//Disable knife cuts (client will see impact, but it won't do any damage)
 	if (StrEqual(currentWeaponName[client_index], "knife", false))
 	{
-		if (buttons & IN_ATTACK)
-		{
-			buttons &= ~IN_ATTACK;
-			return Plugin_Continue;
-		}
-		else if (buttons & IN_ATTACK2)
-		{
-			buttons &= ~IN_ATTACK2;
-			return Plugin_Continue;
-		}
+		float fUnlockTime = GetGameTime() + 1.0;
+		
+		SetEntPropFloat(client_index, Prop_Send, "m_flNextAttack", fUnlockTime);
+		
+		int knife = GetPlayerWeaponSlot(client_index, CS_SLOT_KNIFE)
+		if(knife > 0)
+			SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
 	}
 	
 	// Commands

@@ -27,7 +27,27 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
 
+## Installation
+
+Simply download chickenstrike.smx and place it inside "csgo/addons/sourcemod/plugins/"
+
 ## Cvars
 
 See chickenstrike.cfg
 
+## Commands
+
+    "cs_play_sound" (Play a sound based on player movement: idle if walking or idle, panic if running)
+
+    If cs_playerstyles "1", players can use:
+    "cs_set_skin" (Set player skin)
+    "cs_set_hat" (Set player hat)
+
+    Admin only:
+    "cs_strip_weapons" (Removes all weapons from a specific player)
+
+## Media
+
+![20170417114527_1](https://cloud.githubusercontent.com/assets/23726131/25240615/93b86fb0-25f3-11e7-81b3-f5cbc9b34b3e.jpg)
+![20170417114627_1](https://cloud.githubusercontent.com/assets/23726131/25240660/b1216458-25f3-11e7-8159-e830601399e7.jpg)
+![20170417114936_1](https://cloud.githubusercontent.com/assets/23726131/25240671/bb424ace-25f3-11e7-983b-57f50e1cc7d4.jpg)

@@ -53,19 +53,7 @@ See chickenwars.cfg
 ![20170417114936_1](https://cloud.githubusercontent.com/assets/23726131/25240671/bb424ace-25f3-11e7-983b-57f50e1cc7d4.jpg)
 
 ## Changlelog
-
-* **Version 1.0.2**
-  * Removed grenade sounds
-  * Forced new syntax
-  * Added use of csgocolors.inc
-  * User userid for timers
-  * Code Cleanup
-* **Version 1.0.1**
-  * Added a lock rotation feature
-  * Added ability to hide player radar with cvar
-  * Blocked crouch (not crouch-jump)
-  * Fixed player's chicken animation on spawn
-  * Improved chicken spawn (based on world origin not on spawns)
+[See changlelog.md](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
 
 ### Creator: Keplyx
 ### Current developers: Keplyx, Zipcore

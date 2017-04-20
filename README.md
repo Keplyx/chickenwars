@@ -14,3 +14,6 @@ This plugin also modifies the smokes and the decoys: Smokes creates a lot of chi
 If the server operator enables it with a cvar, players can choose their own skin and hat with commands, he can also choose the amount of non player chickens to spawn (and more, see convar section)
 
 This plugin is best played in small maps like demolition or arms race, in classic casual or competitive. If you play on these maps, don't forget to set mp_buy_anywhere 1, because they do not have buy-zones. You can also make your own map!
+
+## Features
+

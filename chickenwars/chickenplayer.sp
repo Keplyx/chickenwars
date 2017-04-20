@@ -54,7 +54,6 @@ bool canChooseStyle = true;
 //Chicken constants
 const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)  
 const float chickenWalkSpeed = 0.12;
-const float chickenPosOffset = 64.0;
 
 public void OnMapStart()
 {
@@ -112,8 +111,7 @@ void CreateFakeModel(int client_index)
 			SetEntProp(chickens[client_index], Prop_Send, "m_nBody", serverHat[client_index]);
 		//Teleports the chicken at the player's feet
 		float pos[3];
-		GetClientEyePosition(client_index, pos);
-		pos[2] -= chickenPosOffset;
+		GetClientAbsOrigin(client_index, pos);
 		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
 		//Parents the chicken to the player and attaches it
 		SetVariantString("!activator"); AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
@@ -173,8 +171,7 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 	feathersParticles[client_index] = CreateEntityByName("info_particle_system");
 	DispatchKeyValue(feathersParticles[client_index], "effect_name", "chicken_gone_feathers");
 	DispatchKeyValue(feathersParticles[client_index], "angles", "-90 0 0");
-	GetClientEyePosition(client_index, pos);
-	pos[2] -= chickenPosOffset;
+	GetClientAbsOrigin(client_index, pos);
 	TeleportEntity(feathersParticles[client_index], pos, NULL_VECTOR, NULL_VECTOR);
 	DispatchSpawn(feathersParticles[client_index]);
 	ActivateEntity(feathersParticles[client_index]);
@@ -191,15 +188,13 @@ void SetRotationLock(int client_index, bool enabled)
     {
         SetVariantString("!activator");
         AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-        GetClientEyePosition(client_index, pos);
-        pos[2] -= chickenPosOffset;
+        GetClientAbsOrigin(client_index, pos);
         TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
     }
     else
     {
         AcceptEntityInput(chickens[client_index], "SetParent");
-        GetClientEyePosition(client_index, pos);
-        pos[2] -= chickenPosOffset;
+        GetClientAbsOrigin(client_index, pos);
         TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
     }
 } 

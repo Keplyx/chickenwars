@@ -19,6 +19,17 @@
 int weapons[MAXPLAYERS];
 int clientsViewmodels[MAXPLAYERS + 1];
 char currentWeaponName[MAXPLAYERS + 1][32];
+char eggModel[] = "models/chicken/festive_egg.mdl";
+
+enum eggColors
+{
+	WHITE,
+	ORANGE,
+	GREEN,
+	BLUE,
+	YELLOW,
+	PURPLE
+};
 
 public void DisplaySwitching(int client_index)
 {
@@ -48,16 +59,9 @@ public void CreateFakeWeapon(int client_index, int weapon_index)
 		weapons[client_index] = CreateEntityByName("prop_dynamic_override");
 		if (IsValidEntity(weapons[client_index]))
 		{
-			char modelName[128];
-			GetEntPropString(weapon_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
-			SetEntityModel(weapons[client_index], modelName);
-			
 			SetVariantString("!activator");
 			AcceptEntityInput(weapons[client_index], "SetParent", client_index, weapons[client_index], 0);
-			//Put the gun at the chicken's side
-			float pos[] =  { -17.0, -2.0, 15.0 };
-			float rot[3];
-			TeleportEntity(weapons[client_index], pos, rot, NULL_VECTOR);
+			SetModel(client_index, weapon_index, weapon_name)
 			//Make sure the gun is not solid
 			DispatchKeyValue(weapons[client_index], "solid", "0");
 			//Spawn it!
@@ -65,6 +69,53 @@ public void CreateFakeWeapon(int client_index, int weapon_index)
 			ActivateEntity(weapons[client_index]);
 		}
 	}
+}
+
+public void SetModel(int client_index, int weapon_index, char[] classname)
+{
+	if (StrEqual(classname, "weapon_smokegrenade", false))
+	{
+		SetEggGrenade(weapons[client_index], WHITE);
+		SetWeaponPos(client_index, true);
+	}
+	else if (StrEqual(classname, "weapon_decoy", false))
+	{
+		SetEggGrenade(weapons[client_index], YELLOW);
+		SetWeaponPos(client_index, true);
+	}
+	else
+	{
+		char modelName[128];
+		GetEntPropString(weapon_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
+		SetEntityModel(weapons[client_index], modelName);
+		SetWeaponPos(client_index, false);
+	}
+}
+
+public void SetEggGrenade(int weapon_index, int color)
+{
+	SetEntityModel(weapon_index, eggModel);
+	SetEntProp(weapon_index, Prop_Send, "m_nSkin", color);
+}
+
+public void SetWeaponPos(int client_index, bool isGrenade)
+{
+	//Put the gun at the chicken's side
+	float pos[3];
+	if (!isGrenade)
+	{
+		pos[0] = -17.0;
+		pos[1] = -2.0;
+		pos[2] = 15.0;
+	}
+	else
+	{
+		pos[0] = 0.0;
+		pos[1] = -5.0;
+		pos[2] = 15.0;
+	}
+	float rot[3];
+	TeleportEntity(weapons[client_index], pos, rot, NULL_VECTOR);
 }
 
 public void DeleteFakeWeapon(int client_index)
@@ -85,7 +136,6 @@ public void SetWeaponVisibility(int client_index, int weapon, bool enabled)
 		{
 			if (!enabled)
 				SDKHook(worldModel, SDKHook_SetTransmit, Hook_SetTransmit);
-			//SetEntProp(worldModel, Prop_Send, "m_nModelIndex", 0); //Remove the weapon's model: Cause console spam if player has skins (use SetTransmit??)
 			else
 				SDKUnhook(worldModel, SDKHook_SetTransmit, Hook_SetTransmit)
 		}

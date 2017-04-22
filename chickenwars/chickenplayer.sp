@@ -55,11 +55,6 @@ bool canChooseStyle = true;
 const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)  
 const float chickenWalkSpeed = 0.12;
 
-public void OnMapStart()
-{
-	PrecacheModel(chickenModel, true); //Make sure the model is precached to prevent crash
-}
-
 void InitPlayersStyles() //Set skins/hats to server sided for everyone
 {
 	for (int i = 0; i <= MAXPLAYERS; i++)

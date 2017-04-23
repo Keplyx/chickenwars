@@ -76,24 +76,31 @@ public void SetModel(int client_index, int weapon_index, char[] classname)
 	if (StrEqual(classname, "weapon_smokegrenade", false))
 	{
 		SetEggGrenade(weapons[client_index], WHITE);
-		SetWeaponPos(client_index, true);
+		SetWeaponPos(client_index, 1);
 	}
 	else if (StrEqual(classname, "weapon_decoy", false))
 	{
 		SetEggGrenade(weapons[client_index], YELLOW);
-		SetWeaponPos(client_index, true);
+		SetWeaponPos(client_index, 1);
 	}
 	else if (StrEqual(classname, "weapon_tagrenade", false))
 	{
 		SetEggGrenade(weapons[client_index], PURPLE);
-		SetWeaponPos(client_index, true);
+		SetWeaponPos(client_index, 1);
+	}
+	else if (StrEqual(classname, "weapon_healthshot", false))
+		{
+		char modelName[128];
+		GetEntPropString(weapon_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
+		SetEntityModel(weapons[client_index], modelName);
+		SetWeaponPos(client_index, 2);
 	}
 	else
 	{
 		char modelName[128];
 		GetEntPropString(weapon_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
 		SetEntityModel(weapons[client_index], modelName);
-		SetWeaponPos(client_index, false);
+		SetWeaponPos(client_index, 0);
 	}
 }
 
@@ -103,23 +110,31 @@ public void SetEggGrenade(int weapon_index, int color)
 	SetEntProp(weapon_index, Prop_Send, "m_nSkin", color);
 }
 
-public void SetWeaponPos(int client_index, bool isGrenade)
+public void SetWeaponPos(int client_index, int type)
 {
 	//Put the gun at the chicken's side
+	float rot[3];
 	float pos[3];
-	if (!isGrenade)
+	if (type == 0) // normal
 	{
 		pos[0] = -17.0;
 		pos[1] = -2.0;
 		pos[2] = 15.0;
 	}
-	else
+	else if (type == 1) // grenade
 	{
 		pos[0] = 0.0;
 		pos[1] = -5.0;
 		pos[2] = 15.0;
 	}
-	float rot[3];
+	else if (type == 2) // healthshot
+	{
+		pos[0] = -7.0;
+		pos[1] = -23.0;
+		pos[2] = 5.0;
+		rot[2] = 90.0;
+	}
+	
 	TeleportEntity(weapons[client_index], pos, rot, NULL_VECTOR);
 }
 

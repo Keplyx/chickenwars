@@ -7,17 +7,20 @@
 #define SMOKE "weapon_smokegrenade"
 #define DECOY "weapon_decoy"
 #define TACTIC "weapon_tagrenade"
+#define HEALTH "weapon_healthshot"
+
 
 int uspPrice = 2500;
 int ssgPrice = 5000;
 int smokePrice = 1000;
 int decoyPrice = 1500;
 int tacticPrice = 3000;
+int healthPrice = 4000;
 
 char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
 char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
 
-bool canBuy = true;
+bool canBuy = false;
 
 Menu playerMenus[MAXPLAYERS];
 
@@ -36,11 +39,20 @@ public void Menu_Buy(int client_index, int args)
 	playerMenus[client_index] = new Menu(MenuHandler_Buy);
 	playerMenus[client_index].SetTitle("Chicken Wars | Buy Menu");
 	
-	playerMenus[client_index].AddItem(USP, "usp-s");
-	playerMenus[client_index].AddItem(SSG, "ssg08");
-	playerMenus[client_index].AddItem(SMOKE, "Chicken Spawner");		//Smoke
-	playerMenus[client_index].AddItem(DECOY, "Bait");					//Decoy
-	playerMenus[client_index].AddItem(TACTIC, "Detector");				//Tactical grenade
+	char buffer[64];
+	Format(buffer, sizeof(buffer), "usp-s | %i", uspPrice);
+	playerMenus[client_index].AddItem(USP, buffer);
+	Format(buffer, sizeof(buffer), "ssg08 | %i", ssgPrice);
+	playerMenus[client_index].AddItem(SSG, buffer);
+	Format(buffer, sizeof(buffer), "Chicken Spawner | %i", smokePrice);
+	playerMenus[client_index].AddItem(SMOKE, buffer);					//Smoke
+	Format(buffer, sizeof(buffer), "Bait | %i", decoyPrice);
+	playerMenus[client_index].AddItem(DECOY, buffer);					//Decoy
+	Format(buffer, sizeof(buffer), "Detector | %i", tacticPrice);
+	playerMenus[client_index].AddItem(TACTIC, buffer);					//Tactical grenade
+	Format(buffer, sizeof(buffer), "Health Buff | %i", healthPrice);
+	playerMenus[client_index].AddItem(HEALTH, buffer);					//Health shot
+	
 	playerMenus[client_index].ExitButton = true;
 	playerMenus[client_index].Display(client_index, MENU_TIME_FOREVER);
 }
@@ -49,7 +61,7 @@ public void CloseBuyMenus()
 {
 	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
-		if(IsClientInGame(i) && IsValidEntity(i))
+		if(IsValidEntity(i && IsClientInGame(i)))
 			delete playerMenus[i];
 	}
 }
@@ -114,6 +126,11 @@ void BuyWeapon(int client_index, char[] weapon_classname) //Buy weapon if not al
 		else if (StrEqual(weapon_classname, TACTIC) && money >= tacticPrice)
 		{
 			SetEntProp(client_index, Prop_Send, "m_iAccount", money - tacticPrice);
+			GivePlayerItem(client_index, weapon_classname);
+		}
+		else if (StrEqual(weapon_classname, HEALTH) && money >= healthPrice)
+		{
+			SetEntProp(client_index, Prop_Send, "m_iAccount", money - healthPrice);
 			GivePlayerItem(client_index, weapon_classname);
 		}
 		else

@@ -179,6 +179,10 @@ public void OnConfigsExecuted()
 	//Set player weapon
 	SetConVarString(FindConVar("mp_t_default_secondary"), "weapon_p250");
 	SetConVarString(FindConVar("mp_ct_default_secondary"), "weapon_p250");
+	
+	//Set healthshot paramaters
+	SetConVarInt(FindConVar("healthshot_health"), 15);
+	SetConVarInt(FindConVar("ammo_item_limit_healthshot"), 1);
 }
 
 static void RegisterCommands()
@@ -223,9 +227,6 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 	chickenKilledCounter[client_index] = 0;
 	
 	CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
-	//Setup buy menu
-	canBuy = true;
-	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
 }
 
 public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
@@ -237,6 +238,10 @@ public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast
 public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	SpawnChickens();
+	
+	//Setup buy menu
+	canBuy = true;
+	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
 }
 
 public void OnClientPostAdminCheck(int client_index)

@@ -37,10 +37,12 @@
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
 */
 
+//TODO show price on buy menu
+
 /*  New in version 1.0.4
 *
 *   Changed cvar prefix from cs_ to cw_
-*	Slow down player in the air while pressing jump key
+*	New custom buy menu
 *	Change grenades model to eggs
 *
 */
@@ -80,6 +82,7 @@ ConVar cvar_player_styles = null;
 
 ConVar cvar_customsmoke = null;
 ConVar cvar_customdecoy = null;
+ConVar cvar_custombuymenu = null;
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
@@ -154,6 +157,7 @@ public void CreateConVars()
 	
 	cvar_customsmoke = CreateConVar("cw_customsmoke", "1", "Set whether to enable custom smokes. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_customdecoy = CreateConVar("cw_customdecoy", "1", "Set whether to enable custom decoys. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	cvar_custombuymenu = CreateConVar("cw_custombuymenu", "20", "Set how much time the custom buy menu should be displayed after player spawn. 0 = disabled, x = x seconds", FCVAR_NOTIFY, true, 0.0, true, 3600.0);
 	
 	AutoExecConfig(true, "chickenwars");
 }
@@ -172,7 +176,9 @@ public void OnConfigsExecuted()
 	
 	//Disable the event if any (easter, halloween, xmas...)
 	SetConVarBool(FindConVar("sv_holiday_mode"), false);
-	SetConVarBool(FindConVar("mp_buy_anywhere"), true);
+	//Set player weapon
+	SetConVarString(FindConVar("mp_t_default_secondary"), "weapon_p250");
+	SetConVarString(FindConVar("mp_ct_default_secondary"), "weapon_p250");
 }
 
 static void RegisterCommands()
@@ -217,6 +223,9 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 	chickenKilledCounter[client_index] = 0;
 	
 	CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
+	//Setup buy menu
+	canBuy = true;
+	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
 }
 
 public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
@@ -277,6 +286,11 @@ public Action Timer_RemoveRadar(Handle timer, any userid) {
 	int client_index = GetClientOfUserId(userid);
 	if (GetConVarBool(cvar_hideradar) && client_index && IsClientInGame(client_index) && IsPlayerAlive(client_index))
 	SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
+}
+
+public Action Timer_BuyMenu(Handle timer, any userid) {
+	canBuy = false;
+	CloseBuyMenus();
 }
 
 public Action StripWeapons(int client_index, int args) //Set a player defense less
@@ -403,9 +417,9 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	}
 	
 	// Commands
-	if (buttons & IN_BACK)
+	if ((buttons & IN_BACK) && canBuy)
 	{
-		//TODO open shop menu, cooldown
+		Menu_Buy(client_index, 0);
 	}
 	else if (buttons & IN_MOVELEFT)
 	{
@@ -439,20 +453,24 @@ public void Hook_WeaponSwitchPost(int client_index, int weapon_index)
 
 public void Hook_OnPostThinkPost(int entity_index)
 {
-	//Replace the grenade's model by eggs
+	//Replace the grenade's model by eggs (thrown and dropped)
 	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
 	{
 		if (IsValidEntity(i))
 		{
 			char buffer[128];
 			GetEntityClassname(i, buffer, sizeof(buffer))
-			if (StrEqual(buffer, "smokegrenade_projectile", false))
+			if (StrEqual(buffer, "smokegrenade_projectile", false) || StrEqual(buffer, "weapon_smokegrenade", false))
 			{
 				SetEggGrenade(i, WHITE);
 			}
-			if (StrEqual(buffer, "decoy_projectile", false))
+			if (StrEqual(buffer, "decoy_projectile", false) || StrEqual(buffer, "weapon_decoy", false))
 			{
 				SetEggGrenade(i, YELLOW);
+			}
+			if (StrEqual(buffer, "tagrenade_projectile", false) || StrEqual(buffer, "weapon_tagrenade", false))
+			{
+				SetEggGrenade(i, PURPLE);
 			}
 		}
 	}

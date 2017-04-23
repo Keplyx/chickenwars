@@ -21,6 +21,7 @@
 #include <sdkhooks>
 #include <cstrike>
 #include <csgocolors>
+#include <menus>
 
 #pragma newdecls required;
 
@@ -28,6 +29,7 @@
 #include "chickenwars/chickenmanager.sp"
 #include "chickenwars/customweapons.sp"
 #include "chickenwars/weapons.sp"
+#include "chickenwars/menus.sp"
 
 /*  BUGS
 *
@@ -62,9 +64,6 @@ if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
 #define ENT_RADAR 1 << 12
 
 int collisionOffsets;
-
-char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
-char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
 
 ConVar cvar_viewModel = null;
 ConVar cvar_chicken_kill_limit = null;
@@ -121,8 +120,8 @@ public void OnPluginStart()
 	InitPlayersStyles();
 	
 	//Throws Error
-//	LoopIngameClients(i)
-//		OnClientPostAdminCheck(i);
+	//	LoopIngameClients(i)
+	//		OnClientPostAdminCheck(i);
 	
 	
 	if (lateload)
@@ -178,7 +177,6 @@ public void OnConfigsExecuted()
 
 static void RegisterCommands()
 {
-	RegConsoleCmd("cw_play_sound", PlayRandomChickenSound);
 	RegConsoleCmd("cw_set_skin", SetChickenSkin);
 	RegConsoleCmd("cw_set_hat", SetChickenHat);
 	RegAdminCmd("cw_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
@@ -190,7 +188,6 @@ public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM
 	{
 		char sClassname[64];
 		GetEntityClassname(entity, sClassname, sizeof(sClassname));
-		
 		if (StrContains(sClassname, "_projectile") != -1)
 		return Plugin_Stop;
 	}
@@ -280,25 +277,6 @@ public Action Timer_RemoveRadar(Handle timer, any userid) {
 	int client_index = GetClientOfUserId(userid);
 	if (GetConVarBool(cvar_hideradar) && client_index && IsClientInGame(client_index) && IsPlayerAlive(client_index))
 	SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
-}
-
-public Action PlayRandomChickenSound(int client_index, int args)
-{
-	//Play a chicken sound based on player movement
-	//Player should bind it to a key
-	if (wasRunning[client_index])
-	{
-		int rdmSound = GetRandomInt(0, sizeof(chickenPanicSounds) - 1);
-		EmitSoundToAll(chickenPanicSounds[rdmSound], client_index);
-		PrintToConsole(client_index, "Playing panic sound");
-	}
-	else
-	{
-		int rdmSound = GetRandomInt(0, sizeof(chickenIdleSounds) - 1);
-		EmitSoundToAll(chickenIdleSounds[rdmSound], client_index);
-		PrintToConsole(client_index, "Playing idle sound");
-	}
-	return Plugin_Handled;
 }
 
 public Action StripWeapons(int client_index, int args) //Set a player defense less
@@ -435,7 +413,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	}
 	else if (buttons & IN_MOVERIGHT)
 	{
-		//TODO Play taunt sound, cooldown
+		Menu_Taunt(client_index, 0);
 	}
 	
 	return Plugin_Changed;
@@ -478,7 +456,7 @@ public void Hook_OnPostThinkPost(int entity_index)
 			}
 		}
 	}
-
+	
 	SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
 	//Update convars for other files
 	chickenHealth = GetConVarInt(cvar_health);

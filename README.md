@@ -1,4 +1,5 @@
-# Chicken Wars 1.0.3
+![chicken wars logo x150](https://cloud.githubusercontent.com/assets/23726131/25303338/cd6c64e2-2750-11e7-8890-daa6a24b3229.png)
+
 Counter Strike, but chickens only.
 
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.

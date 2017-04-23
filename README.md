@@ -29,13 +29,13 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
 
-## [Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
+## [ :globe_with_meridians:Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
 
 ## Installation
 
 Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"
 
-## [Cvars](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
+## [ :globe_with_meridians:Cvars](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
 
 ## Commands
 

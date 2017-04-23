@@ -14,7 +14,7 @@ If the server operator enables it with a cvar, players can choose their own skin
 
 This plugin is best played in small maps like demolition or arms race, in classic casual or competitive. If you play on these maps, don't forget to set mp_buy_anywhere 1, because they do not have buy-zones. You can also make your own map!
 
-### [See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
+### [:globe_with_meridians: See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
 
 ## Features
 
@@ -29,11 +29,13 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
 
+## [:globe_with_meridians: Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
+
 ## Installation
 
 Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"
 
-## [Cvars](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
+## [:globe_with_meridians: Cvars](https://github.com/Keplyx/chickenwars/blob/master/chickenwars.cfg)
 
 ## Commands
 
@@ -52,7 +54,7 @@ Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugi
 ![20170417114627_1](https://cloud.githubusercontent.com/assets/23726131/25240660/b1216458-25f3-11e7-8159-e830601399e7.jpg)
 ![20170417114936_1](https://cloud.githubusercontent.com/assets/23726131/25240671/bb424ace-25f3-11e7-983b-57f50e1cc7d4.jpg)
 
-## [Changlelog](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
+## [:globe_with_meridians: Changlelog](https://github.com/Keplyx/chickenwars/blob/master/Changlelog.md)
 
 ### Creator: Keplyx
 ### Current developers: Keplyx, Zipcore

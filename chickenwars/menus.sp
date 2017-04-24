@@ -2,20 +2,11 @@
 #define IDLE "#idle"
 #define PANIC "#panic"
 
-#define USP "weapon_hkp2000"
-#define SSG "weapon_ssg08"
-#define SMOKE "weapon_smokegrenade"
-#define DECOY "weapon_decoy"
-#define TACTIC "weapon_tagrenade"
-#define HEALTH "weapon_healthshot"
 
-
-int uspPrice = 2500;
-int ssgPrice = 5000;
-int smokePrice = 1000;
-int decoyPrice = 1500;
-int tacticPrice = 3000;
-int healthPrice = 4000;
+char itemNames[][] = {"weapon_hkp2000", "weapon_ssg08", "weapon_smokegrenade", "weapon_decoy", "weapon_tagrenade", "weapon_healthshot"};
+char displayNames[][] = {"usp-s", "ssg08", "Chicken Spawner", "Bait", "Detector", "Health Buff"};
+int itemPrices[] = {2500, 5000, 1000, 1500, 3000, 4000}; 
+int itemsBrought[MAXPLAYERS + 1][sizeof(itemNames)];
 
 char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
 char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
@@ -23,6 +14,8 @@ char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambi
 bool canBuy = false;
 
 Menu playerMenus[MAXPLAYERS];
+
+
 
 public void Menu_Taunt(int client_index, int args)
 {
@@ -40,18 +33,12 @@ public void Menu_Buy(int client_index, int args)
 	playerMenus[client_index].SetTitle("Chicken Wars | Buy Menu");
 	
 	char buffer[64];
-	Format(buffer, sizeof(buffer), "usp-s | %i", uspPrice);
-	playerMenus[client_index].AddItem(USP, buffer);
-	Format(buffer, sizeof(buffer), "ssg08 | %i", ssgPrice);
-	playerMenus[client_index].AddItem(SSG, buffer);
-	Format(buffer, sizeof(buffer), "Chicken Spawner | %i", smokePrice);
-	playerMenus[client_index].AddItem(SMOKE, buffer);					//Smoke
-	Format(buffer, sizeof(buffer), "Bait | %i", decoyPrice);
-	playerMenus[client_index].AddItem(DECOY, buffer);					//Decoy
-	Format(buffer, sizeof(buffer), "Detector | %i", tacticPrice);
-	playerMenus[client_index].AddItem(TACTIC, buffer);					//Tactical grenade
-	Format(buffer, sizeof(buffer), "Health Buff | %i", healthPrice);
-	playerMenus[client_index].AddItem(HEALTH, buffer);					//Health shot
+	
+	for (int i = 0; i < sizeof(itemNames); i++)
+	{
+		Format(buffer, sizeof(buffer), "%s | %i",displayNames[i] ,itemPrices[i]);
+		playerMenus[client_index].AddItem(itemNames[i], buffer);
+	}
 	
 	playerMenus[client_index].ExitButton = true;
 	playerMenus[client_index].Display(client_index, MENU_TIME_FOREVER);
@@ -62,9 +49,26 @@ public void CloseBuyMenus()
 	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
 		if(IsValidEntity(i && IsClientInGame(i)))
-			delete playerMenus[i];
+		delete playerMenus[i];
 	}
 }
+
+public void ResetAllItems()
+{
+	for (int i = 1; i <= MAXPLAYERS; i++)
+	{
+		ResetClientItems(i);
+	}
+}
+
+public void ResetClientItems(int client_index)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		itemsBrought[client_index][i] = 0;
+	}
+}
+
 
 public int MenuHandler_Taunt(Menu menu, MenuAction action, int param1, int params)
 {
@@ -73,15 +77,14 @@ public int MenuHandler_Taunt(Menu menu, MenuAction action, int param1, int param
 		char buffer[64];
 		menu.GetItem(params, buffer, sizeof(buffer));
 		if (StrEqual(buffer, IDLE))
-			PlayRandomIdleSound(param1);
+		PlayRandomIdleSound(param1);
 		else if (StrEqual(buffer, PANIC))
-			PlayRandomPanicSound(param1);
+		PlayRandomPanicSound(param1);
 	}
 	else if (action == MenuAction_End)
 	{
-			delete menu;
+		delete menu;
 	}
-		
 }
 
 public int MenuHandler_Buy(Menu menu, MenuAction action, int param1, int params)
@@ -93,54 +96,33 @@ public int MenuHandler_Buy(Menu menu, MenuAction action, int param1, int params)
 		BuyWeapon(param1, buffer);
 	}
 	else if (action == MenuAction_End)
-		delete menu;
+	delete menu;
 }
 
-void BuyWeapon(int client_index, char[] weapon_classname) //Buy weapon if not already owned and have enough money
+void BuyWeapon(int client_index, char[] weapon_classname) //Buy weapon if not already bought and have enough money
 {
 	int money = GetEntProp(client_index, Prop_Send, "m_iAccount");
-	if (!CheckWeapon(client_index, weapon_classname))
+	
+	for (int i = 0; i < sizeof(itemNames); i++)
 	{
-		if (StrEqual(weapon_classname, USP) && money >= uspPrice)
+		if (StrEqual(weapon_classname, itemNames[i]) && money >= itemPrices[i] && itemsBrought[client_index][i] != 1)
 		{
-			DropWeapon(client_index, 1);
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - uspPrice);
+			if (StrEqual(weapon_classname, "weapon_hkp2000"))
+				DropWeapon(client_index, 1);
+			if (StrEqual(weapon_classname, "weapon_ssg08"))
+				DropWeapon(client_index, 0);
+			SetEntProp(client_index, Prop_Send, "m_iAccount", money - itemPrices[i]);
 			GivePlayerItem(client_index, weapon_classname);
+			itemsBrought[client_index][i] = 1;
 		}
-		else if (StrEqual(weapon_classname, SSG) && money >= ssgPrice)
-		{
-			DropWeapon(client_index, 0);
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - ssgPrice);
-			GivePlayerItem(client_index, weapon_classname);
-		}
-		else if (StrEqual(weapon_classname, SMOKE) && money >= smokePrice)
-		{
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - smokePrice);
-			GivePlayerItem(client_index, weapon_classname);
-		}
-		else if (StrEqual(weapon_classname, DECOY) && money >= decoyPrice)
-		{
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - decoyPrice);
-			GivePlayerItem(client_index, weapon_classname);
-		}
-		else if (StrEqual(weapon_classname, TACTIC) && money >= tacticPrice)
-		{
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - tacticPrice);
-			GivePlayerItem(client_index, weapon_classname);
-		}
-		else if (StrEqual(weapon_classname, HEALTH) && money >= healthPrice)
-		{
-			SetEntProp(client_index, Prop_Send, "m_iAccount", money - healthPrice);
-			GivePlayerItem(client_index, weapon_classname);
-		}
-		else
+		else if (StrEqual(weapon_classname, itemNames[i]) && money < itemPrices[i])
 		{
 			PrintHintText(client_index, "<font color='#ff0000' size='30'>Not enough money</font>");
 		}
-	}
-	else
-	{
-		PrintHintText(client_index, "<font color='#ff0000' size='30'>Gun already owned</font>");
+		else if (StrEqual(weapon_classname, itemNames[i]) && itemsBrought[client_index][i] == 1)
+		{
+			PrintHintText(client_index, "<font color='#ff0000' size='30'>Item already bought</font>");
+		}
 	}
 }
 
@@ -151,24 +133,6 @@ void DropWeapon(int client_index, int slot)
 	{
 		CS_DropWeapon(client_index, weapon_index, false, false);
 	}
-}
-
-bool CheckWeapon(int client_index, char[] weapon_classname) //Cycles through player's weapons and check if already have selected
-{
-	for (int i = 0; i <= 10; i++)
-	{
-		int weapon_index = GetPlayerWeaponSlot(client_index, i);
-		if (weapon_index != -1)
-		{
-			char buffer[64];
-			GetEntityClassname(weapon_index, buffer, sizeof(buffer));
-			if (StrEqual(buffer, weapon_classname))
-			{
-				return true;// If 2 grenades owned, the second is ignored
-			}
-		}
-	}
-	return false;
 }
 
 

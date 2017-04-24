@@ -37,7 +37,6 @@
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
 */
 
-//TODO show price on buy menu
 
 /*  New in version 1.0.4
 *
@@ -83,6 +82,7 @@ ConVar cvar_player_styles = null;
 ConVar cvar_customsmoke = null;
 ConVar cvar_customdecoy = null;
 ConVar cvar_custombuymenu = null;
+
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
@@ -238,7 +238,8 @@ public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast
 public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	SpawnChickens();
-	
+	ResetAllItems();
+	CPrintToChatAll("{yellow}Open the buy menu bu pressing {white}[S]");
 	//Setup buy menu
 	canBuy = true;
 	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
@@ -256,6 +257,7 @@ public void OnClientDisconnect(int client_index)
 {
 	DisableChicken(client_index);
 	ResetPlayerStyle(client_index);
+	ResetClientItems(client_index);
 }
 
 public void OnEntityCreated(int entity_index, const char[] classname)

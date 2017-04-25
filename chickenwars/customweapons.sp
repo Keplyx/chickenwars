@@ -16,6 +16,8 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+char zombieModel[] = "models/chicken/chicken_zombie.mdl";
+
 public void ChickenDecoy(int client_index, float pos[3], int currentWeapon) //Change grenade into an armed chicken!!!!!!!
 {
 	int entity = CreateEntityByName("chicken");
@@ -83,4 +85,31 @@ public void ChickenSmoke(float pos[3]) //Change grenade into a lot of chickens!!
 				RemoveEdict(entity);
 		}
 	}
-} 
+}
+
+public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zombies
+{
+	PrintToChatAll("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+	//Area effect size
+	float area[3] =  { 200.0, 200.0, 100.0 };
+	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
+	{
+		if (IsValidEntity(i))
+		{
+			char buffer[128];
+			GetEntityClassname(i, buffer, sizeof(buffer))
+			if (StrEqual(buffer, "chicken", false))
+			{
+				float fOrigin[3];
+				GetEntPropVector(i, Prop_Send, "m_vecOrigin", fOrigin);
+				// If chicken is outside of the area, do nothing
+				for (int j = 0; j < sizeof(area); j++)
+				{
+					if (!(fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j]))
+						return;
+				}
+			}
+			SetEntityModel(i, zombieModel);
+		}
+	}
+}

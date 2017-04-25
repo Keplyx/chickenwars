@@ -35,6 +35,7 @@
 *
 *   Reload while ammo full //Y U DO DIS
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
+*	Incendiary grenade not calling custom function
 */
 
 
@@ -42,6 +43,7 @@
 *
 *	Changed cvar prefix from cs_ to cw_
 *	New custom buy menu
+*	Tactical grenades and health shots now available
 *	Change grenades model to eggs
 *	Slow player falling speed by pressing [SPACE]
 *
@@ -82,6 +84,7 @@ ConVar cvar_player_styles = null;
 
 ConVar cvar_customsmoke = null;
 ConVar cvar_customdecoy = null;
+ConVar cvar_custominc = null;
 ConVar cvar_custombuymenu = null;
 
 
@@ -158,6 +161,7 @@ public void CreateConVars()
 	
 	cvar_customsmoke = CreateConVar("cw_customsmoke", "1", "Set whether to enable custom smokes. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_customdecoy = CreateConVar("cw_customdecoy", "1", "Set whether to enable custom decoys. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	cvar_custominc = CreateConVar("cw_custominc", "1", "Set whether to enable custom incendiary grenades. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_custombuymenu = CreateConVar("cw_custombuymenu", "20", "Set how much time the custom buy menu should be displayed after player spawn. 0 = disabled, x = x seconds", FCVAR_NOTIFY, true, 0.0, true, 3600.0);
 	
 	AutoExecConfig(true, "chickenwars");
@@ -272,6 +276,10 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
 	if (StrEqual(classname, "decoy_projectile", false) && GetConVarBool(cvar_customdecoy))
+	{
+		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
+	}
+	if (StrEqual(classname, "incgrenade_projectile", false) && GetConVarBool(cvar_custominc))
 	{
 		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
@@ -512,7 +520,8 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 		ChickenSmoke(fOrigin);
 		else if (StrEqual(buffer, "decoy_projectile"))
 		ChickenDecoy(client_index, fOrigin, weapons[client_index]);
-		
+		else if (StrEqual(buffer, "incgrenade_projectile"))
+		ZombieInc(fOrigin);
 		AcceptEntityInput(entity_index, "Kill");
 	}
 }

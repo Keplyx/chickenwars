@@ -16,7 +16,6 @@ bool canBuy = false;
 Menu playerMenus[MAXPLAYERS];
 
 
-
 public void Menu_Taunt(int client_index, int args)
 {
 	Menu menu = new Menu(MenuHandler_Taunt);

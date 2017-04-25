@@ -38,11 +38,12 @@
 */
 
 
-/*  New in version 1.0.4
+/*  New in this version
 *
-*   Changed cvar prefix from cs_ to cw_
+*	Changed cvar prefix from cs_ to cw_
 *	New custom buy menu
 *	Change grenades model to eggs
+*	Slow player falling speed by pressing [SPACE]
 *
 */
 
@@ -403,6 +404,10 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	else
 	SetRotationLock(client_index, false);
 	
+	if ((buttons & IN_JUMP) && !(GetEntityFlags(client_index) & FL_ONGROUND))
+	{
+		SlowPlayerFall(client_index);
+	}
 	
 	//Block crouch but not crouch-jump
 	if ((buttons & IN_DUCK) && (GetEntityFlags(client_index) & FL_ONGROUND))

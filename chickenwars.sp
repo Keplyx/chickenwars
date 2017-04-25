@@ -279,12 +279,28 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 	{
 		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
-	if (StrEqual(classname, "incgrenade_projectile", false) && GetConVarBool(cvar_custominc))
+	if ((StrEqual(classname, "hegrenade_projectile", false) || StrEqual(classname, "molotov_projectile", false)) && GetConVarBool(cvar_custominc))
 	{
-		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
+		CreateTimer(0.0, Timer_DefuseHegrenade, entity_index);
+		SDKHook(entity_index, SDKHook_StartTouch, StartTouchInc);
+		//SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
 }
 
+public Action Timer_DefuseHegrenade(Handle timer, any ref)
+{
+	int ent = EntRefToEntIndex( ref );
+	if ( ent != INVALID_ENT_REFERENCE )
+	    SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
+}
+
+public Action StartTouchInc(int iEntity, int iEntity2)
+{
+	float fOrigin[3];
+	GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", fOrigin);
+	ZombieInc(fOrigin);
+	AcceptEntityInput(iEntity, "Kill");
+}
 
 public Action Timer_WelcomeMessage(Handle timer, int client_index)
 {

@@ -89,7 +89,6 @@ public void ChickenSmoke(float pos[3]) //Change grenade into a lot of chickens!!
 
 public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zombies
 {
-	PrintToChatAll("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 	//Area effect size
 	float area[3] =  { 200.0, 200.0, 100.0 };
 	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
@@ -98,18 +97,22 @@ public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zom
 		{
 			char buffer[128];
 			GetEntityClassname(i, buffer, sizeof(buffer))
+			//PrintToChatAll("%s", buffer);
 			if (StrEqual(buffer, "chicken", false))
 			{
 				float fOrigin[3];
 				GetEntPropVector(i, Prop_Send, "m_vecOrigin", fOrigin);
 				// If chicken is outside of the area, do nothing
+				bool inside = false;
 				for (int j = 0; j < sizeof(area); j++)
 				{
-					if (!(fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j]))
-						return;
+					inside = fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j];
+					if (!inside)
+						break;
 				}
+				if (inside)
+					SetEntityModel(i, zombieModel);
 			}
-			SetEntityModel(i, zombieModel);
 		}
 	}
 }

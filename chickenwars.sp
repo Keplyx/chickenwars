@@ -16,6 +16,7 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
@@ -299,8 +300,31 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 	}
 	if (StrEqual(classname, "hegrenade_projectile", false) && GetConVarBool(cvar_customhe))
 	{
-		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
+		SDKHook(entity_index, SDKHook_StartTouch, StartTouchHegrenade);
+	}
+}
+
+public Action StartTouchHegrenade(int iEntity, int iEntity2)
+{
+    int iRef = EntIndexToEntRef(iEntity);
+    CreateTimer(1.0, Timer_CreateExpChicken, iRef);
+}
+
+public Action Timer_CreateExpChicken(Handle timer, any ref)
+{
+	int entity_index = EntRefToEntIndex(ref);
+	if (entity_index != INVALID_ENT_REFERENCE){
+		float fVelocity[3];
+		GetEntPropVector(entity_index, Prop_Send, "m_vecVelocity", fVelocity);
+		if (fVelocity[0] == 0.0 && fVelocity[1] == 0.0 && fVelocity[2] == 0.0)
+		{
+			float fOrigin[3];
+			GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", fOrigin);
+			int owner = GetEntPropEnt(entity_index, Prop_Send, "m_hOwnerEntity");
+			ExplosiveChicken(fOrigin, owner);
+			AcceptEntityInput(entity_index, "Kill");
+		}
 	}
 }
 
@@ -521,7 +545,7 @@ public void Hook_OnPostThinkPost(int entity_index)
 			{
 				SetEggGrenade(i, GREEN);
 			}
-			if (StrEqual(buffer, "hegrenade_projectile", false))
+			if (StrEqual(buffer, "hegrenade_projectile", false) || StrEqual(buffer, "weapon_hegrenade", false))
 			{
 				SetEggGrenade(i, ORANGE);
 			}
@@ -554,11 +578,54 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 		ChickenSmoke(fOrigin);
 		else if (StrEqual(buffer, "decoy_projectile"))
 		ChickenDecoy(client_index, fOrigin, weapons[client_index]);
-		else if (StrEqual(buffer, "hegrenade_projectile"))
-		ExplosiveChicken(fOrigin);
 		AcceptEntityInput(entity_index, "Kill");
 	}
 }
+
+public void Hook_OnChickenThinkPost(int entity_index)
+{
+	float area[3] =  { 80.0, 80.0, 80.0 };
+	for (int i = 1; i <= MAXPLAYERS; i++)
+	{
+		if (IsValidClient(i))
+		{
+			
+			//int owner = GetEntPropEnt(entity_index, Prop_Send, "m_hOwnerEntity");
+			//if (GetClientTeam(i) != GetClientTeam(owner))
+			//{
+				float fOrigin[3];
+				GetClientAbsOrigin(i, fOrigin);
+				float pos[3];
+				GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", pos);
+				bool inside = false;
+				for (int j = 0; j < sizeof(area); j++)
+				{
+					inside = fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j];
+					if (!inside)
+						break;
+				}
+				if (inside)
+					createExplosion(pos);
+			//}
+		}
+	}
+}
+
+public void createExplosion(float pos[3])
+{
+	int entity = CreateEntityByName("env_explosion");
+	if (IsValidEntity(entity))
+	{
+		TeleportEntity(entity, pos, NULL_VECTOR, NULL_VECTOR);
+		DispatchSpawn(entity);
+		ActivateEntity(entity);
+		DispatchKeyValue(entity, "iMagnitude", "100"); 
+		SetVariantString("!activator");
+		AcceptEntityInput(entity, "Explode", entity, entity);
+		AcceptEntityInput(entity, "Kill");
+	}
+}
+
 
 public bool TRDontHitSelf(int entity, int mask, any data) //Trace hull filter
 {
@@ -612,3 +679,13 @@ public Action Hook_SetTransmit(int entity, int client)
 {
 	return Plugin_Handled;
 }
+
+
+stock bool IsValidClient(int client)
+{ 
+    if (client <= 0 || client > MaxClients || !IsClientConnected(client))
+    {
+        return false; 
+    }
+    return IsClientInGame(client); 
+}  

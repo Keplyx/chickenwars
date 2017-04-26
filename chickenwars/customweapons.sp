@@ -90,7 +90,7 @@ public void ChickenSmoke(float pos[3]) //Change grenade into a lot of chickens!!
 public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zombies
 {
 	//Area effect size
-	float area[3] =  { 200.0, 200.0, 100.0 };
+	float area[3] =  { 120.0, 120.0, 50.0 };
 	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
 	{
 		if (IsValidEntity(i))

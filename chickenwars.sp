@@ -35,7 +35,7 @@
 *
 *   Reload while ammo full //Y U DO DIS
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
-*	Incendiary grenade not calling custom function
+*
 */
 
 
@@ -46,6 +46,7 @@
 *	Tactical grenades and health shots now available
 *	Change grenades model to eggs
 *	Slow player falling speed by pressing [SPACE]
+*	Molotov turns non-player chickens into zombies
 *
 */
 
@@ -116,6 +117,7 @@ public void OnPluginStart()
 	HookEvent("player_spawn", Event_PlayerSpawn);
 	HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("round_start", Event_RoundStart);
+	HookEvent("inferno_startburn", Event_InfernoStartBurn, EventHookMode_Pre);
 	AddNormalSoundHook(NormalSHook);
 	
 	CreateConVars();
@@ -250,6 +252,17 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
 }
 
+public Action Event_InfernoStartBurn(Handle event, const char[] name, bool dontBroadcast)
+{
+	int entity = GetEventInt(event, "entityid");
+	float fOrigin[3];
+	GetEntPropVector(entity, Prop_Send, "m_vecOrigin", fOrigin);
+	ZombieInc(fOrigin);
+	AcceptEntityInput(entity, "Kill");
+	return Plugin_Changed;
+}
+
+
 public void OnClientPostAdminCheck(int client_index)
 {
 	SDKHook(client_index, SDKHook_PostThinkPost, Hook_OnPostThinkPost);
@@ -279,27 +292,21 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 	{
 		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 	}
-	if ((StrEqual(classname, "hegrenade_projectile", false) || StrEqual(classname, "molotov_projectile", false)) && GetConVarBool(cvar_custominc))
+	if ((StrEqual(classname, "incgrenade_projectile", false) || StrEqual(classname, "molotov_projectile", false)) && GetConVarBool(cvar_custominc))
 	{
-		CreateTimer(0.0, Timer_DefuseHegrenade, entity_index);
-		SDKHook(entity_index, SDKHook_StartTouch, StartTouchInc);
-		//SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
+		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
+	}
+	if (StrEqual(classname, "hegrenade_projectile", false) && GetConVarBool(cvar_custominc))
+	{
+		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
 	}
 }
 
-public Action Timer_DefuseHegrenade(Handle timer, any ref)
+public Action Timer_DefuseGrenade(Handle timer, any ref)
 {
 	int ent = EntRefToEntIndex( ref );
 	if ( ent != INVALID_ENT_REFERENCE )
 	    SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
-}
-
-public Action StartTouchInc(int iEntity, int iEntity2)
-{
-	float fOrigin[3];
-	GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", fOrigin);
-	ZombieInc(fOrigin);
-	AcceptEntityInput(iEntity, "Kill");
 }
 
 public Action Timer_WelcomeMessage(Handle timer, int client_index)
@@ -507,6 +514,10 @@ public void Hook_OnPostThinkPost(int entity_index)
 			if (StrEqual(buffer, "tagrenade_projectile", false) || StrEqual(buffer, "weapon_tagrenade", false))
 			{
 				SetEggGrenade(i, PURPLE);
+			}
+			if (StrEqual(buffer, "molotov_projectile", false) || StrEqual(buffer, "incgrenade_projectile", false) || StrEqual(buffer, "weapon_molotov", false) || StrEqual(buffer, "weapon_incgrenade", false))
+			{
+				SetEggGrenade(i, GREEN);
 			}
 		}
 	}

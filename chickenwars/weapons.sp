@@ -88,6 +88,11 @@ public void SetModel(int client_index, int weapon_index, char[] classname)
 		SetEggGrenade(weapons[client_index], PURPLE);
 		SetWeaponPos(client_index, 1);
 	}
+	else if (StrEqual(classname, "weapon_molotov", false) || StrEqual(classname, "weapon_incgrenade", false))
+	{
+		SetEggGrenade(weapons[client_index], GREEN);
+		SetWeaponPos(client_index, 1);
+	}
 	else if (StrEqual(classname, "weapon_healthshot", false))
 		{
 		char modelName[128];

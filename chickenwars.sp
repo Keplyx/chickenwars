@@ -86,8 +86,8 @@ ConVar cvar_player_styles = null;
 ConVar cvar_customsmoke = null;
 ConVar cvar_customdecoy = null;
 ConVar cvar_custominc = null;
+ConVar cvar_customhe = null;
 ConVar cvar_custombuymenu = null;
-
 
 int chickenKilledCounter[MAXPLAYERS + 1];
 
@@ -164,6 +164,7 @@ public void CreateConVars()
 	cvar_customsmoke = CreateConVar("cw_customsmoke", "1", "Set whether to enable custom smokes. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_customdecoy = CreateConVar("cw_customdecoy", "1", "Set whether to enable custom decoys. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_custominc = CreateConVar("cw_custominc", "1", "Set whether to enable custom incendiary grenades. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	cvar_customhe = CreateConVar("cw_customhe", "1", "Set whether to enable custom HE grenades. 0 = disabled, 1 = enabled", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_custombuymenu = CreateConVar("cw_custombuymenu", "20", "Set how much time the custom buy menu should be displayed after player spawn. 0 = disabled, x = x seconds", FCVAR_NOTIFY, true, 0.0, true, 3600.0);
 	
 	AutoExecConfig(true, "chickenwars");
@@ -296,17 +297,18 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 	{
 		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
 	}
-	if (StrEqual(classname, "hegrenade_projectile", false) && GetConVarBool(cvar_custominc))
+	if (StrEqual(classname, "hegrenade_projectile", false) && GetConVarBool(cvar_customhe))
 	{
+		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
 		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
 	}
 }
 
 public Action Timer_DefuseGrenade(Handle timer, any ref)
 {
-	int ent = EntRefToEntIndex( ref );
-	if ( ent != INVALID_ENT_REFERENCE )
-	    SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
+	int ent = EntRefToEntIndex(ref);
+	if (ent != INVALID_ENT_REFERENCE)
+	SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
 }
 
 public Action Timer_WelcomeMessage(Handle timer, int client_index)
@@ -519,6 +521,10 @@ public void Hook_OnPostThinkPost(int entity_index)
 			{
 				SetEggGrenade(i, GREEN);
 			}
+			if (StrEqual(buffer, "hegrenade_projectile", false))
+			{
+				SetEggGrenade(i, ORANGE);
+			}
 		}
 	}
 	
@@ -537,6 +543,7 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 	GetEntPropVector(entity_index, Prop_Send, "m_vecVelocity", fVelocity);
 	if (fVelocity[0] == 0.0 && fVelocity[1] == 0.0 && fVelocity[2] == 0.0)
 	{
+		PrintToChatAll("bbbbbbbb");
 		int client_index = GetEntPropEnt(entity_index, Prop_Data, "m_hOwnerEntity")
 		float fOrigin[3];
 		GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", fOrigin);
@@ -547,8 +554,8 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 		ChickenSmoke(fOrigin);
 		else if (StrEqual(buffer, "decoy_projectile"))
 		ChickenDecoy(client_index, fOrigin, weapons[client_index]);
-		else if (StrEqual(buffer, "incgrenade_projectile"))
-		ZombieInc(fOrigin);
+		else if (StrEqual(buffer, "hegrenade_projectile"))
+		ExplosiveChicken(fOrigin);
 		AcceptEntityInput(entity_index, "Kill");
 	}
 }

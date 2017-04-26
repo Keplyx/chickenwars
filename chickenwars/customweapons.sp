@@ -17,6 +17,7 @@
 */
 
 char zombieModel[] = "models/chicken/chicken_zombie.mdl";
+int expChickens[];
 
 public void ChickenDecoy(int client_index, float pos[3], int currentWeapon) //Change grenade into an armed chicken!!!!!!!
 {
@@ -114,5 +115,20 @@ public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zom
 					SetEntityModel(i, zombieModel);
 			}
 		}
+	}
+}
+public void ExplosiveChicken(float pos[3]) //Creates a chicken wich will explode when an enemy goes near it
+{
+	int entity = CreateEntityByName("chicken");
+	if (IsValidEntity(entity))
+	{
+		SetChickenStyle(entity); //Hats!
+		//Random orientation
+		float rot[3];
+		rot[1] = GetRandomFloat(0.0, 360.0);
+		TeleportEntity(entity, pos, rot, NULL_VECTOR);
+		DispatchSpawn(entity);
+		ActivateEntity(entity);
+		
 	}
 }

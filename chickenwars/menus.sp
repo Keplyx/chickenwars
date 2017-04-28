@@ -21,7 +21,7 @@
 
 char itemNames[][] = {"weapon_hkp2000", "weapon_ssg08", "weapon_smokegrenade", "weapon_decoy", "weapon_tagrenade", "weapon_molotov", "weapon_hegrenade", "weapon_healthshot"};
 char displayNames[][] = {"usp-s", "ssg08", "Chicken Spawner", "Bait", "Detector", "Zombie Egg", "Kamikaze","Health Buff"};
-int itemPrices[] = {2500, 5000, 500, 1500, 3000, 200, 4000, 4000}; 
+int itemPrices[sizeof(itemNames)]; 
 int itemsBrought[MAXPLAYERS + 1][sizeof(itemNames)];
 
 char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
@@ -31,6 +31,13 @@ bool canBuy = false;
 
 Menu playerMenus[MAXPLAYERS];
 
+public void UpdatePrices(Handle[] prices)
+{
+	for (int i = 0; i < sizeof(itemNames); i++)
+	{
+		itemPrices[i] = GetConVarInt(prices[i]);
+	}	
+}
 
 public void Menu_Taunt(int client_index, int args)
 {
@@ -63,7 +70,7 @@ public void CloseBuyMenus()
 {
 	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
-		if(IsValidEntity(i) && IsClientInGame(i))
+		if(IsValidClient(i))
 			delete playerMenus[i];
 	}
 }

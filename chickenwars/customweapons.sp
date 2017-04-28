@@ -16,6 +16,8 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+char zombieModel[] = "models/chicken/chicken_zombie.mdl";
+
 public void ChickenDecoy(int client_index, float pos[3], int currentWeapon) //Change grenade into an armed chicken!!!!!!!
 {
 	int entity = CreateEntityByName("chicken");
@@ -83,4 +85,50 @@ public void ChickenSmoke(float pos[3]) //Change grenade into a lot of chickens!!
 				RemoveEdict(entity);
 		}
 	}
-} 
+}
+
+public void ZombieInc(float pos[3]) // Turns nearby non-player chickens into zombies
+{
+	//Area effect size
+	float area[3] =  { 120.0, 120.0, 50.0 };
+	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
+	{
+		if (IsValidEntity(i))
+		{
+			char buffer[128];
+			GetEntityClassname(i, buffer, sizeof(buffer))
+			//PrintToChatAll("%s", buffer);
+			if (StrEqual(buffer, "chicken", false))
+			{
+				float fOrigin[3];
+				GetEntPropVector(i, Prop_Send, "m_vecOrigin", fOrigin);
+				// If chicken is outside of the area, do nothing
+				bool inside = false;
+				for (int j = 0; j < sizeof(area); j++)
+				{
+					inside = fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j];
+					if (!inside)
+						break;
+				}
+				if (inside)
+					SetEntityModel(i, zombieModel);
+			}
+		}
+	}
+}
+public void ExplosiveChicken(float pos[3], int client_index) //Creates a chicken wich will explode when an enemy goes near it
+{
+	int entity = CreateEntityByName("chicken");
+	if (IsValidEntity(entity))
+	{
+		SetChickenStyle(entity); //Hats!
+		//Random orientation
+		float rot[3];
+		rot[1] = GetRandomFloat(0.0, 360.0);
+		TeleportEntity(entity, pos, rot, NULL_VECTOR);
+		DispatchSpawn(entity);
+		ActivateEntity(entity);
+		//SetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity", client_index);
+		SDKHook(entity, SDKHook_ThinkPost, Hook_OnChickenThinkPost);
+	}
+}

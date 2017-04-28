@@ -1,3 +1,12 @@
+* **Version 1.1.0**
+  *	Changed cvar prefix from cs_ to cw_
+  *	New custom buy menu
+  *	Prices can be changed with cvars
+  *	Tactical grenades and health shots now available
+  *	Change grenades model to eggs
+  *	Slow player falling speed by pressing [SPACE]
+  *	Molotov turns non-player chickens into zombies
+  *	HE grenades creates a kamikaze chicken
 * **Version 1.0.3**
   * Fixed fall animation
   * Blocked client side knife animation

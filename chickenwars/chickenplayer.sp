@@ -54,11 +54,7 @@ bool canChooseStyle = true;
 //Chicken constants
 const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)  
 const float chickenWalkSpeed = 0.12;
-
-public void OnMapStart()
-{
-	PrecacheModel(chickenModel, true); //Make sure the model is precached to prevent crash
-}
+const float maxFallSpeed = -100.0;
 
 void InitPlayersStyles() //Set skins/hats to server sided for everyone
 {
@@ -203,6 +199,25 @@ void SetClientSpeed(int client_index, float speed)
 {
 	SetEntPropFloat(client_index, Prop_Send, "m_flLaggedMovementValue", speed); //reduce player's speed (including falling speed)
 }
+
+public void SlowPlayerFall(int client_index)
+{
+	float vel[3];
+	GetEntPropVector(client_index, Prop_Data, "m_vecVelocity", vel);
+	if (vel[2] < 0.0)
+	{
+		float oldSpeed = vel[2];
+		
+		// Player is falling to fast, lets slow him to maxFallSpeed
+		if(vel[2] < maxFallSpeed)
+			vel[2] = maxFallSpeed;
+		
+		// Fallspeed changed
+		if(oldSpeed != vel[2])
+			TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);
+	}
+}
+
 
 public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling anim each 1s (doesn't loop)
 {

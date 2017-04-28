@@ -23,8 +23,9 @@ This plugin is best played in small maps like demolition or arms race, in classi
 ## Features
 
    * Player chickens
-   * Play chicken sounds with a menu (right key)
+   * Play chicken sounds with [move right] key
    * Move forward only (chickens don't walk backwards or sideways)
+   * Slow falling speed with [space]
    * Smokes spawns chickens
    * Decoy spawns an armed chicken
    * Molotovs turns chickens into zombies
@@ -32,7 +33,7 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Chickens can have skins and hats
    * Spawns defined number of chickens in the map
    * Blocks players from killing non-player chickens
-   * Use a custom buy menu to restrict usage of weapon, by pressing down key after spawn (custom prices)
+   * Use a custom buy menu to restrict usage of weapon, by pressing [move down] key after spawn (custom prices)
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
    * Customisation through cvars

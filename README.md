@@ -1,6 +1,6 @@
 ![chicken wars logo x150](https://cloud.githubusercontent.com/assets/23726131/25303338/cd6c64e2-2750-11e7-8890-daa6a24b3229.png)
 
-Counter Strike, but chickens only.
+Counter Strike: GLobal Offensive, but chickens only.
 
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.
 The goal is simply to kill the enemy team, but as you have very little health and are too slow to evade fire, you must hide with normal chickens scattered across the map.

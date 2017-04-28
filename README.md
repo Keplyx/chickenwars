@@ -40,8 +40,6 @@ This plugin is best played in small maps like demolition or arms race, in classi
 
 ## [:globe_with_meridians: Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
 
-## [:globe_with_meridians: Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
-
 ## Installation
 
 Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"

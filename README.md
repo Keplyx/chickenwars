@@ -35,6 +35,7 @@ This plugin is best played in small maps like demolition or arms race, in classi
    * Use a custom buy menu to restrict usage of weapon, by pressing down key after spawn (custom prices)
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
+   * Customisation through cvars
 
 ## [:globe_with_meridians: Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)
 

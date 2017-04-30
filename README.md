@@ -19,11 +19,11 @@ If the server operator enables it with a cvar, players can choose their own skin
 This plugin is **best played in small maps like demolition or arms race**, in classic casual or competitive, as they are rather small. You can also make your own map!
 
 
+### [:globe_with_meridians: See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
+
 ## Installation
 
-Simply download chickenwars.smx and place it inside "csgo/addons/sourcemod/plugins/"
-
-### [:globe_with_meridians: See the wiki for more info](https://github.com/Keplyx/chickenwars/wiki)
+Simply download [chickenwars.smx](https://github.com/Keplyx/chickenwars/raw/master/chickenwars.smx) and place it inside "csgo/addons/sourcemod/plugins/"
 
 ## Features
 

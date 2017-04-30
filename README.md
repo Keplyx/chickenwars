@@ -2,6 +2,8 @@
 
 ### Counter Strike: Global Offensive, but chickens only.
 
+### [Allied Modders Thread](https://forums.alliedmods.net/showthread.php?t=296290)
+
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.
 The goal is simply to kill the enemy team, but as you have very little health and are too slow to evade fire, you must hide with normal chickens scattered across the map.
 

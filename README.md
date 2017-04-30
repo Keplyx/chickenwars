@@ -1,6 +1,6 @@
 ![chicken wars logo x150](https://cloud.githubusercontent.com/assets/23726131/25303338/cd6c64e2-2750-11e7-8890-daa6a24b3229.png)
 
-#### Counter Strike: Global Offensive, but chickens only.
+### Counter Strike: Global Offensive, but chickens only.
 
 A plugin in which players move like chickens, look like chickens, sound like chickens, BUT, they also have guns.
 The goal is simply to kill the enemy team, but as you have very little health and are too slow to evade fire, you must hide with normal chickens scattered across the map.
@@ -8,7 +8,7 @@ The goal is simply to kill the enemy team, but as you have very little health an
 When you hold your knife, you cannot do damage and are hidden (nobody will see your gun), but as soon as you **draw a gun, it will appear at your side**, and will become an easy target. To behave like a real chicken, you can make sounds with a menu (show it with the [move right] key).
 You would think it's easy, because you would just have to kill every chicken and hope you kill a player, but you **cannot kill more than one non-player** chicken until you kill yourself.
 
-**his plugin also modifies the smokes, the decoys, the molotovs and the he grenades:**
+**This plugin also modifies the smokes, the decoys, the molotovs and the he grenades:**
 * [Smokes](http://i.imgur.com/czW5vcF.gifv) creates a lot of chickens so you can hide with them.
 * [Decoys](http://i.imgur.com/6Z4uDQJ.gifv) creates a chicken with your weapon drawn, to bait the other team.
 * [Molotovs](http://i.imgur.com/xyJFF92.gifv) (and incendiaries) turns non-player chickens within range into zombies.

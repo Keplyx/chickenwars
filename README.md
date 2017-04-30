@@ -23,7 +23,9 @@ This plugin is **best played in small maps like demolition or arms race**, in cl
 
 ## Installation
 
-Simply download **[chickenwars.smx](https://github.com/Keplyx/chickenwars/raw/master/chickenwars.smx)** and place it inside "csgo/addons/sourcemod/plugins/"
+Simply download **[chickenwars.smx](https://github.com/Keplyx/chickenwars/raw/master/chickenwars.smx)** and place it in your server inside "csgo/addons/sourcemod/plugins/".
+
+If you do not own a server yet, I recommend using **[csgosl](https://github.com/lenosisnickerboa/csgosl)**.
 
 ## Features
 

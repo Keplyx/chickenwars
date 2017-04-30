@@ -9,10 +9,10 @@ When you hold your knife, you cannot do damage and are hidden (nobody will see y
 You would think it's easy, because you would just have to kill every chicken and hope you kill a player, but you cannot kill more than one non-player chicken until you kill yourself.
 
 This plugin also modifies the smokes, the decoys, the molotovs and the he grenades:
-* Smokes creates a lot of chickens so you can hide with them.
-* Decoys creates a chicken with your weapon drawn, to bait the other team.
-* Molotovs (and incendiaries) turns non-player chickens within range into zombies.
-* He grenades creates a kamikaze chicken which will explode is a player goes near it (including you and your team!).
+* [Smokes](http://i.imgur.com/czW5vcF.gifv) creates a lot of chickens so you can hide with them.
+* [Decoys](http://i.imgur.com/6Z4uDQJ.gifv) creates a chicken with your weapon drawn, to bait the other team.
+* [Molotovs](http://i.imgur.com/xyJFF92.gifv) (and incendiaries) turns non-player chickens within range into zombies.
+* [He grenades](http://i.imgur.com/qjlB7Wv.gifv) creates a kamikaze chicken which will explode is a player goes near it (including you and your team!).
 
 If the server operator enables it with a cvar, players can choose their own skin and hat with commands, the amount of non player chickens to spawn (and more, see convar section), and the use of a custom buy menu (with custom prices).
 

@@ -50,7 +50,7 @@ Simply download **[chickenwars.smx](https://github.com/Keplyx/chickenwars/raw/ma
 
 ## Commands
 
-    "cw_play_sound" (Play a sound based on player movement: idle if walking or idle, panic if running)
+
 
     If cs_playerstyles "1", players can use:
     "cw_set_skin" (Set player skin)

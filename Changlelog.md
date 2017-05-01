@@ -1,3 +1,6 @@
+* **Version 1.1.1**
+  *	Added FFA (Free For All) mode
+  * Removed chat message on thrown decoy/smoke
 * **Version 1.1.0**
   *	Changed cvar prefix from cs_ to cw_
   *	New custom buy menu

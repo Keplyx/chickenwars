@@ -35,6 +35,7 @@ ConVar cvar_custominc = null;
 ConVar cvar_customhe = null;
 ConVar cvar_custombuymenu = null;
 ConVar cvar_prices[sizeof(itemNames)];
+ConVar cvar_ffa = null;
 
 public void CreateConVars(char[] version)
 {
@@ -72,6 +73,8 @@ public void CreateConVars(char[] version)
 	cvar_prices[6] = CreateConVar("cw_kamikaze_price", "1500", "Set kamikaze chicken price in custom buy menu.", FCVAR_NOTIFY, true, 0.0, true, max_price);
 	cvar_prices[7] = CreateConVar("cw_health_price", "3000", "Set health shot price in custom buy menu.", FCVAR_NOTIFY, true, 0.0, true, max_price);
 	
+	cvar_ffa = CreateConVar("cw_ffa", "0", "Set whether to enable Free For All mode.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	cvar_ffa.AddChangeHook(SetFFA);
 	AutoExecConfig(true, "chickenwars");
 }
 
@@ -97,6 +100,26 @@ public void IntiCvars()
 	SetConVarInt(FindConVar("healthshot_health"), 15);
 	SetConVarInt(FindConVar("ammo_item_limit_healthshot"), 1);
 }
+
+public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)
+{
+	bool isFFA = StringToInt(newValue) == 1;
+	if (isFFA)
+	{
+		SetConVarBool(FindConVar("mp_teammates_are_enemies"), true);
+		SetConVarInt(FindConVar("mp_dm_time_between_bonus_max"), 9999); //Stop bonus weapons
+		SetConVarInt(FindConVar("mp_dm_time_between_bonus_min"), 9999); //Stop bonus weapons
+		SetConVarInt(FindConVar("sv_infinite_ammo"), 0);
+	}
+	else
+	{
+		ResetConVar(FindConVar("mp_dm_time_between_bonus_max"));
+		ResetConVar(FindConVar("mp_dm_time_between_bonus_min"));
+		SetConVarBool(FindConVar("mp_teammates_are_enemies"), false);
+	}
+	ServerCommand("mp_restartgame 1");
+}
+
 
 public void RegisterCommands()
 {

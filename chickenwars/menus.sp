@@ -27,15 +27,19 @@ int itemsBrought[MAXPLAYERS + 1][sizeof(itemNames)];
 char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
 char chickenPanicSounds[][] =  { "ambient/creatures/chicken_panic_01.wav", "ambient/creatures/chicken_panic_02.wav", "ambient/creatures/chicken_panic_03.wav", "ambient/creatures/chicken_panic_04.wav" }
 
-bool canBuy = false;
+bool canBuyAll = false;
+bool canBuy[MAXPLAYERS + 1];
 
 Menu playerMenus[MAXPLAYERS];
 
-public void UpdatePrices(Handle[] prices)
+public void UpdatePrices(Handle[] prices, bool isFFA)
 {
 	for (int i = 0; i < sizeof(itemNames); i++)
 	{
-		itemPrices[i] = GetConVarInt(prices[i]);
+		if (!isFFA)
+			itemPrices[i] = GetConVarInt(prices[i]);
+		else
+			itemPrices[i] = 0;
 	}	
 }
 
@@ -70,9 +74,14 @@ public void CloseBuyMenus()
 {
 	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
-		if(IsValidClient(i))
-			delete playerMenus[i];
+		ClosePlayerBuyMenu(i);
 	}
+}
+
+public void ClosePlayerBuyMenu(int client_index)
+{
+	if(IsValidClient(client_index) && playerMenus[client_index] != INVALID_HANDLE)
+		delete playerMenus[client_index];
 }
 
 public void ResetAllItems()
@@ -85,7 +94,7 @@ public void ResetAllItems()
 
 public void ResetClientItems(int client_index)
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < sizeof(itemNames); i++)
 	{
 		itemsBrought[client_index][i] = 0;
 	}

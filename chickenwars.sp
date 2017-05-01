@@ -43,14 +43,8 @@
 
 /*  New in this version
 *
-*	Changed cvar prefix from cs_ to cw_
-*	New custom buy menu
-*	Prices can be changed with cvars
-*	Tactical grenades and health shots now available
-*	Change grenades model to eggs
-*	Slow player falling speed by pressing [SPACE]
-*	Molotov turns non-player chickens into zombies
-*	HE grenades creates a kamikaze chicken
+*	Added FFA mode
+*	Removed chat message on thrown decoy/smoke
 *
 */
 
@@ -147,6 +141,8 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 {
 	int victim = GetClientOfUserId(GetEventInt(event, "userid"));
 	DisableChicken(victim);
+	if (GetConVarBool(cvar_ffa))
+		ClosePlayerBuyMenu(victim);
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
@@ -165,6 +161,12 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 	chickenKilledCounter[client_index] = 0;
 	
 	CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
+	canBuy[client_index] = true;
+	if (GetConVarBool(cvar_ffa)){
+		ResetClientItems(client_index);
+		int ref = EntIndexToEntRef(client_index);
+		CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenuPlayer, ref);
+	}
 }
 
 public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
@@ -179,8 +181,9 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 	ResetAllItems();
 	CPrintToChatAll("{yellow}Open the buy menu bu pressing {white}[S]");
 	//Setup buy menu
-	canBuy = true;
-	CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
+	canBuyAll = true;
+	if (!GetConVarBool(cvar_ffa))
+		CreateTimer(GetConVarFloat(cvar_custombuymenu), Timer_BuyMenu);
 }
 
 public Action Event_InfernoStartBurn(Handle event, const char[] name, bool dontBroadcast)
@@ -278,13 +281,21 @@ public Action Timer_WelcomeMessage(Handle timer, int client_index)
 
 public Action Timer_RemoveRadar(Handle timer, any userid) {
 	int client_index = GetClientOfUserId(userid);
-	if (GetConVarBool(cvar_hideradar) && client_index && IsClientInGame(client_index) && IsPlayerAlive(client_index))
+	if (GetConVarBool(cvar_hideradar) && IsValidClient(client_index))
 	SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
 }
 
 public Action Timer_BuyMenu(Handle timer, any userid) {
-	canBuy = false;
+	
 	CloseBuyMenus();
+}
+
+public Action Timer_BuyMenuPlayer(Handle timer, any userid) {
+	int client_index = EntRefToEntIndex(userid);
+	if (IsValidClient(client_index))
+	{
+		ClosePlayerBuyMenu(client_index);
+	}
 }
 
 public Action StripWeapons(int client_index, int args) //Set a player defense less
@@ -415,9 +426,9 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	}
 	
 	// Commands
-	if ((buttons & IN_BACK) && canBuy)
+	if ((buttons & IN_BACK) && canBuyAll && canBuy[client_index])
 	{
-		UpdatePrices(cvar_prices);
+		UpdatePrices(cvar_prices, GetConVarBool(cvar_ffa));
 		Menu_Buy(client_index, 0);
 	}
 	else if (buttons & IN_MOVELEFT)
@@ -481,7 +492,6 @@ public void Hook_OnPostThinkPost(int entity_index)
 			}
 		}
 	}
-	
 	SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
 	//Update convars for other files
 	chickenHealth = GetConVarInt(cvar_health);
@@ -497,7 +507,6 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 	GetEntPropVector(entity_index, Prop_Send, "m_vecVelocity", fVelocity);
 	if (fVelocity[0] == 0.0 && fVelocity[1] == 0.0 && fVelocity[2] == 0.0)
 	{
-		PrintToChatAll("bbbbbbbb");
 		int client_index = GetEntPropEnt(entity_index, Prop_Data, "m_hOwnerEntity")
 		float fOrigin[3];
 		GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", fOrigin);

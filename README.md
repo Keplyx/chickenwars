@@ -45,6 +45,7 @@ If you do not own a server yet, I recommend using **[csgosl](https://github.com/
    * Use a custom buy menu to restrict usage of weapon, by pressing [move down] key after spawn (custom prices)
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
+   * FFA mode (play in deathmatch)
    * Customisation through cvars
 
 ## [:globe_with_meridians: Incoming Features](https://github.com/Keplyx/chickenwars/issues/1)

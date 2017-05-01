@@ -72,6 +72,7 @@ public void Menu_Buy(int client_index, int args)
 
 public void CloseBuyMenus()
 {
+	canBuyAll = false;
 	for (int i = 1; i <= MAXPLAYERS; i++)
 	{
 		ClosePlayerBuyMenu(i);
@@ -80,8 +81,10 @@ public void CloseBuyMenus()
 
 public void ClosePlayerBuyMenu(int client_index)
 {
-	if(IsValidClient(client_index) && playerMenus[client_index] != INVALID_HANDLE)
+	if(IsValidClient(client_index) && playerMenus[client_index] != INVALID_HANDLE){
+		canBuy[client_index] = false;
 		delete playerMenus[client_index];
+	}
 }
 
 public void ResetAllItems()

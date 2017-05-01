@@ -44,6 +44,7 @@
 /*  New in this version
 *
 *	Added FFA mode
+*	Removed chat message on thrown decoy/smoke
 *
 */
 
@@ -140,6 +141,8 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 {
 	int victim = GetClientOfUserId(GetEventInt(event, "userid"));
 	DisableChicken(victim);
+	if (GetConVarBool(cvar_ffa))
+		ClosePlayerBuyMenu(victim);
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
@@ -283,7 +286,7 @@ public Action Timer_RemoveRadar(Handle timer, any userid) {
 }
 
 public Action Timer_BuyMenu(Handle timer, any userid) {
-	canBuyAll = false;
+	
 	CloseBuyMenus();
 }
 
@@ -291,7 +294,6 @@ public Action Timer_BuyMenuPlayer(Handle timer, any userid) {
 	int client_index = EntRefToEntIndex(userid);
 	if (IsValidClient(client_index))
 	{
-		canBuy[client_index] = false;
 		ClosePlayerBuyMenu(client_index);
 	}
 }
@@ -505,7 +507,6 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 	GetEntPropVector(entity_index, Prop_Send, "m_vecVelocity", fVelocity);
 	if (fVelocity[0] == 0.0 && fVelocity[1] == 0.0 && fVelocity[2] == 0.0)
 	{
-		PrintToChatAll("bbbbbbbb");
 		int client_index = GetEntPropEnt(entity_index, Prop_Data, "m_hOwnerEntity")
 		float fOrigin[3];
 		GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", fOrigin);

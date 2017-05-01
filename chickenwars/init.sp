@@ -99,6 +99,8 @@ public void IntiCvars()
 	//Set healthshot paramaters
 	SetConVarInt(FindConVar("healthshot_health"), 15);
 	SetConVarInt(FindConVar("ammo_item_limit_healthshot"), 1);
+	// Prevents players from being kicked for killing chickens
+	SetConVarBool(FindConVar("mp_autokick"), false);
 }
 
 public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)

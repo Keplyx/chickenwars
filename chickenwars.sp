@@ -390,8 +390,12 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	// Disable non-forward movement :3
 	if (vel[1] != 0)
 	vel[1] = 0.0;
-	if (vel[0] < 0)
-	vel[0] = 0.0;
+	//Block back movement if +use is not pressed
+	if (!(buttons & IN_USE))
+	{
+		if (vel[0] < 0)
+		vel[0] = 0.0;
+	}
 	
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
@@ -413,7 +417,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		return Plugin_Continue;
 	}
 	
-	//Disable knife cuts (client will see impact, but it won't do any damage)
+	//Disable knife cuts
 	if (StrEqual(currentWeaponName[client_index], "knife", false))
 	{
 		float fUnlockTime = GetGameTime() + 1.0;
@@ -425,12 +429,9 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
 	}
 	
+	
 	// Commands
-	if (buttons & IN_BACK)
-	{
-		
-	}
-	else if ((buttons & IN_MOVELEFT) && canBuyAll && canBuy[client_index])
+	if ((buttons & IN_MOVELEFT) && canBuyAll && canBuy[client_index])
 	{
 		UpdatePrices(cvar_prices, GetConVarBool(cvar_ffa));
 		Menu_Buy(client_index, 0);

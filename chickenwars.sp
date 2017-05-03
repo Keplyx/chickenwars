@@ -37,14 +37,16 @@
 *
 *   Reload while ammo full //Y U DO DIS
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
+*	Buying an usp will give you a p2000 if you equipped it in the game loadout
 *
 */
 
 
 /*  New in this version
 *
-*	Added FFA mode
-*	Removed chat message on thrown decoy/smoke
+*	Added dollar symbol next to prices in custom buy menu
+*	Open buy menu with [+left]
+*	Can move backwards if pressing [+back] and [+use]
 *
 */
 

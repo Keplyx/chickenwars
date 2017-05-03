@@ -1,3 +1,7 @@
+* **Version 1.1.2**
+  *	Added dollar symbol next to prices in custom buy menu
+  * Open buy menu with [+left]
+  * Can move backwards if pressing [+back] and [+use]
 * **Version 1.1.1**
   *	Added FFA (Free For All) mode
   * Removed chat message on thrown decoy/smoke

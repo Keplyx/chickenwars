@@ -34,8 +34,8 @@ If you do not own a server yet, I recommend using **[csgosl](https://github.com/
 ## Features
 
    * Player chickens
-   * Play chicken sounds with [move right] key
-   * Move forward only (chickens don't walk backwards or sideways)
+   * Play chicken sounds with [+right] key
+   * Move forward only , or backwards if pressing [+back] and [+use]
    * Slow falling speed with [space]
    * Smokes spawns chickens
    * Decoy spawns an armed chicken
@@ -44,7 +44,7 @@ If you do not own a server yet, I recommend using **[csgosl](https://github.com/
    * Chickens can have skins and hats
    * Spawns defined number of chickens in the map
    * Blocks players from killing non-player chickens
-   * Use a custom buy menu to restrict usage of weapon, by pressing [move down] key after spawn (custom prices)
+   * Use a custom buy menu to restrict usage of weapon, by pressing [+left] key after spawn (custom prices)
    * Hide view model to feel like a real chicken (little buggy with alt+tab and bot controlling, can be re-enabled)
    * Hide radar to help hiding with chickens
    * FFA mode (play in deathmatch)

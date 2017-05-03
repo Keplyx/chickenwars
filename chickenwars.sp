@@ -426,14 +426,14 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	}
 	
 	// Commands
-	if ((buttons & IN_BACK) && canBuyAll && canBuy[client_index])
+	if (buttons & IN_BACK)
+	{
+		
+	}
+	else if ((buttons & IN_MOVELEFT) && canBuyAll && canBuy[client_index])
 	{
 		UpdatePrices(cvar_prices, GetConVarBool(cvar_ffa));
 		Menu_Buy(client_index, 0);
-	}
-	else if (buttons & IN_MOVELEFT)
-	{
-		//TODO ??? free ???, cooldown
 	}
 	else if (buttons & IN_MOVERIGHT)
 	{

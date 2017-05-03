@@ -35,7 +35,7 @@ If you do not own a server yet, I recommend using **[csgosl](https://github.com/
 
    * Player chickens
    * Play chicken sounds with [+right] key
-   * Move forward only , or backwards if pressing [+back] and [+use]
+   * Move forward only, or backwards if pressing [+back] and [+use]
    * Slow falling speed with [space]
    * Smokes spawns chickens
    * Decoy spawns an armed chicken

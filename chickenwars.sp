@@ -37,14 +37,16 @@
 *
 *   Reload while ammo full //Y U DO DIS
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
+*	Buying an usp will give you a p2000 if you equipped it in the game loadout
 *
 */
 
 
 /*  New in this version
 *
-*	Added FFA mode
-*	Removed chat message on thrown decoy/smoke
+*	Added dollar symbol next to prices in custom buy menu
+*	Open buy menu with [+left]
+*	Can move backwards if pressing [+back] and [+use]
 *
 */
 
@@ -390,12 +392,16 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	// Disable non-forward movement :3
 	if (vel[1] != 0)
 	vel[1] = 0.0;
-	if (vel[0] < 0)
-	vel[0] = 0.0;
+	//Block backward movement if +use is not pressed
+	if (!(buttons & IN_USE))
+	{
+		if (vel[0] < 0)
+		vel[0] = 0.0;
+	}
 	
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
-	isMoving[client_index] = vel[0] > 0.0;
+	isMoving[client_index] = vel[0] > 0.0 || vel[0] < 0.0;
 	if (isMoving[client_index] || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
 	SetRotationLock(client_index, true);
 	else
@@ -413,7 +419,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		return Plugin_Continue;
 	}
 	
-	//Disable knife cuts (client will see impact, but it won't do any damage)
+	//Disable knife cuts
 	if (StrEqual(currentWeaponName[client_index], "knife", false))
 	{
 		float fUnlockTime = GetGameTime() + 1.0;
@@ -425,15 +431,12 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
 	}
 	
+	
 	// Commands
-	if ((buttons & IN_BACK) && canBuyAll && canBuy[client_index])
+	if ((buttons & IN_MOVELEFT) && canBuyAll && canBuy[client_index])
 	{
 		UpdatePrices(cvar_prices, GetConVarBool(cvar_ffa));
 		Menu_Buy(client_index, 0);
-	}
-	else if (buttons & IN_MOVELEFT)
-	{
-		//TODO ??? free ???, cooldown
 	}
 	else if (buttons & IN_MOVERIGHT)
 	{

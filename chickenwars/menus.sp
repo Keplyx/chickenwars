@@ -62,7 +62,7 @@ public void Menu_Buy(int client_index, int args)
 	
 	for (int i = 0; i < sizeof(itemNames); i++)
 	{
-		Format(buffer, sizeof(buffer), "%s | %i",displayNames[i] ,itemPrices[i]);
+		Format(buffer, sizeof(buffer), "%s | %i $",displayNames[i] ,itemPrices[i]);
 		playerMenus[client_index].AddItem(itemNames[i], buffer);
 	}
 	

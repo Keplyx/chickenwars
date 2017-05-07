@@ -44,10 +44,8 @@
 
 /*  New in this version
 *
-*	Added dollar symbol next to prices in custom buy menu
-*	Open buy menu with [+left]
-*	Can move backwards if pressing [+back] and [+use]
-*
+*	Fixed version number
+*	
 */
 
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
@@ -63,7 +61,7 @@ if (IsClientInGame( % 1) && !IsFakeClient( % 1))
 #define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
 
-#define VERSION "1.0.4"
+#define VERSION "1.1.2"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12
@@ -109,8 +107,8 @@ public void OnPluginStart()
 	InitPlayersStyles();
 	
 	//Throws Error
-	//	LoopIngameClients(i)
-	//		OnClientPostAdminCheck(i);
+	//LoopIngameClients(i)
+	//	OnClientPostAdminCheck(i);
 	
 	if (lateload)
 	ServerCommand("mp_restartgame 1");

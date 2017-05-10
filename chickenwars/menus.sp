@@ -81,7 +81,7 @@ public void CloseBuyMenus()
 
 public void ClosePlayerBuyMenu(int client_index)
 {
-	if(IsValidClient(client_index) && playerMenus[client_index] != INVALID_HANDLE){
+	if(IsValidClient(client_index) && !IsFakeClient(client_index) && playerMenus[client_index] != INVALID_HANDLE){
 		canBuy[client_index] = false;
 		delete playerMenus[client_index];
 	}
@@ -129,8 +129,8 @@ public int MenuHandler_Buy(Menu menu, MenuAction action, int param1, int params)
 		menu.GetItem(params, buffer, sizeof(buffer));
 		BuyWeapon(param1, buffer);
 	}
-	else if (action == MenuAction_End)
-	delete menu;
+	else if (action == MenuAction_End && IsValidClient(param1))
+	delete playerMenus[param1];
 }
 
 void BuyWeapon(int client_index, char[] weapon_classname) //Buy weapon if not already bought and have enough money

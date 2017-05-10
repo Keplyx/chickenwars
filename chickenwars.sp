@@ -44,9 +44,10 @@
 
 /*  New in this version
 *
-*	Added dollar symbol next to prices in custom buy menu
-*	Open buy menu with [+left]
-*	Can move backwards if pressing [+back] and [+use]
+*	Updated custom buy menu message
+*	Display custom buy menu message only if enabled
+*	Fixed menu errors
+*	Fixed lateload support
 *
 */
 
@@ -63,7 +64,7 @@ if (IsClientInGame( % 1) && !IsFakeClient( % 1))
 #define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
 
-#define VERSION "1.0.4"
+#define VERSION "1.1.3"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12
@@ -109,8 +110,14 @@ public void OnPluginStart()
 	InitPlayersStyles();
 	
 	//Throws Error
-	//	LoopIngameClients(i)
-	//		OnClientPostAdminCheck(i);
+	//LoopIngameClients(i)
+	//	OnClientPostAdminCheck(i);
+	
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && !IsFakeClient(i))
+			OnClientPostAdminCheck(i);
+	}
 	
 	if (lateload)
 	ServerCommand("mp_restartgame 1");
@@ -181,7 +188,9 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 {
 	SpawnChickens();
 	ResetAllItems();
-	CPrintToChatAll("{yellow}Open the buy menu bu pressing {white}[S]");
+	if (GetConVarInt(cvar_custombuymenu) > 0){
+		CPrintToChatAll("{yellow}Open the buy menu bu pressing {white}[MOVELEFT]{yellow}. Available for {white}%d s", GetConVarInt(cvar_custombuymenu));
+	}
 	//Setup buy menu
 	canBuyAll = true;
 	if (!GetConVarBool(cvar_ffa))

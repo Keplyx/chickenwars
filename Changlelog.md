@@ -1,3 +1,8 @@
+* **Version 1.1.3**
+  *	Updated custom buy menu message
+  * Display custom buy menu message only if enabled
+  * Fixed menu errors
+  * Fixed lateload support
 * **Version 1.1.2**
   *	Added dollar symbol next to prices in custom buy menu
   * Open buy menu with [+left]

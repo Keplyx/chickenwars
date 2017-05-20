@@ -44,10 +44,10 @@
 
 /*  New in this version
 *
-*	Updated custom buy menu message
-*	Display custom buy menu message only if enabled
-*	Fixed menu errors
-*	Fixed lateload support
+*	Removed loaded message
+*	Forced sv_party_mode 0
+*	Revert cvars on unload
+*	Removed chickens on unload
 *
 */
 
@@ -120,19 +120,14 @@ public void OnPluginStart()
 	}
 	
 	if (lateload)
-	ServerCommand("mp_restartgame 1");
-	
-	PrintToServer("***********************************");
-	PrintToServer(">>>>>>>Chicken Wars successfuly loaded");
-	PrintToServer("***********************************");
+		ServerCommand("mp_restartgame 1");
 }
 
 public void OnPluginEnd()
 {
 	ResetCvars();
-	PrintToServer("***********************************");
-	PrintToServer("<<<<<<Chicken Wars successfuly unloaded");
-	PrintToServer("***********************************");
+	RemoveChickens();
+	ServerCommand("mp_restartgame 1");
 }
 
 public void OnConfigsExecuted()

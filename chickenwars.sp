@@ -127,6 +127,11 @@ public void OnPluginEnd()
 {
 	ResetCvars();
 	RemoveChickens();
+	for(int i = 1; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i))
+			DisableChicken(i);
+	}
 	ServerCommand("mp_restartgame 1");
 }
 

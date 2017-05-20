@@ -123,10 +123,17 @@ public void OnPluginStart()
 	ServerCommand("mp_restartgame 1");
 	
 	PrintToServer("***********************************");
-	PrintToServer("* Chicken Wars successfuly loaded *");
+	PrintToServer(">>>>>>>Chicken Wars successfuly loaded");
 	PrintToServer("***********************************");
 }
 
+public void OnPluginEnd()
+{
+	ResetCvars();
+	PrintToServer("***********************************");
+	PrintToServer("<<<<<<Chicken Wars successfuly unloaded");
+	PrintToServer("***********************************");
+}
 
 public void OnConfigsExecuted()
 {

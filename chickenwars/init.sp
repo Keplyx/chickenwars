@@ -92,6 +92,7 @@ public void IntiCvars()
 	
 	//Disable the event if any (easter, halloween, xmas...)
 	SetConVarBool(FindConVar("sv_holiday_mode"), false);
+	SetConVarBool(FindConVar("sv_party_mode"), false);
 	//Set player weapon
 	SetConVarString(FindConVar("mp_t_default_secondary"), "weapon_p250");
 	SetConVarString(FindConVar("mp_ct_default_secondary"), "weapon_p250");
@@ -101,6 +102,21 @@ public void IntiCvars()
 	SetConVarInt(FindConVar("ammo_item_limit_healthshot"), 1);
 	// Prevents players from being kicked for killing chickens
 	SetConVarBool(FindConVar("mp_autokick"), false);
+}
+
+public void ResetCvars()
+{
+	ResetConVar(FindConVar("mp_teamname_1"));
+	ResetConVar(FindConVar("mp_teamname_2"));
+	ResetConVar(FindConVar("sv_disable_immunity_alpha"));
+	ResetConVar(FindConVar("sv_footstep_sound_frequency"));
+	ResetConVar(FindConVar("sv_holiday_mode"));
+	ResetConVar(FindConVar("sv_party_mode"));
+	ResetConVar(FindConVar("mp_t_default_secondary"));
+	ResetConVar(FindConVar("mp_ct_default_secondary"));
+	ResetConVar(FindConVar("healthshot_health"));
+	ResetConVar(FindConVar("ammo_item_limit_healthshot"));
+	ResetConVar(FindConVar("mp_autokick"));
 }
 
 public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)
@@ -117,7 +133,7 @@ public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)
 	{
 		ResetConVar(FindConVar("mp_dm_time_between_bonus_max"));
 		ResetConVar(FindConVar("mp_dm_time_between_bonus_min"));
-		SetConVarBool(FindConVar("mp_teammates_are_enemies"), false);
+		ResetConVar(FindConVar("mp_teammates_are_enemies"));
 	}
 	ServerCommand("mp_restartgame 1");
 }

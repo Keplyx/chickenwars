@@ -207,11 +207,9 @@ public void SlowPlayerFall(int client_index)
 	if (vel[2] < 0.0)
 	{
 		float oldSpeed = vel[2];
-		
-		// Player is falling to fast, lets slow him to maxFallSpeed
+		// Player is falling too fast, lets slow him to maxFallSpeed
 		if(vel[2] < maxFallSpeed)
 			vel[2] = maxFallSpeed;
-		
 		// Fallspeed changed
 		if(oldSpeed != vel[2])
 			TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);

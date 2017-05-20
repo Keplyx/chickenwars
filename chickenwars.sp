@@ -48,6 +48,7 @@
 *	Forced sv_party_mode 0
 *	Revert cvars on unload
 *	Removed chickens on unload
+*	Fixed invisible players on unload
 *
 */
 
@@ -446,7 +447,6 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		if (knife > 0)
 		SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
 	}
-	
 	
 	// Commands
 	if ((buttons & IN_MOVELEFT) && canBuyAll && canBuy[client_index])

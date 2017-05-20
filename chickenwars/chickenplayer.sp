@@ -6,12 +6,12 @@
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*
+*   
 *   This program is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *   GNU General Public License for more details.
-*
+*   
 *   You should have received a copy of the GNU General Public License
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -52,7 +52,7 @@ int chickenHealth = 15;
 bool canChooseStyle = true;
 
 //Chicken constants
-const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)
+const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)  
 const float chickenWalkSpeed = 0.12;
 const float maxFallSpeed = -100.0;
 
@@ -97,14 +97,14 @@ void CreateFakeModel(int client_index)
 		
 		//Set skin/hat
 		if (playerSkin[client_index] != -1 && canChooseStyle)
-		SetEntProp(chickens[client_index], Prop_Send, "m_nSkin", playerSkin[client_index]); //0=normal 1=brown chicken
+			SetEntProp(chickens[client_index], Prop_Send, "m_nSkin", playerSkin[client_index]); //0=normal 1=brown chicken
 		else
-		SetEntProp(chickens[client_index], Prop_Send, "m_nSkin", serverSkin[client_index]);
+			SetEntProp(chickens[client_index], Prop_Send, "m_nSkin", serverSkin[client_index]);
 		
 		if (playerHat[client_index] != -1 && canChooseStyle)
-		SetEntProp(chickens[client_index], Prop_Send, "m_nBody", playerHat[client_index]); //0=normal 1=BdayHat 2=ghost 3=XmasSweater 4=bunnyEars 5=pumpkinHead
+			SetEntProp(chickens[client_index], Prop_Send, "m_nBody", playerHat[client_index]); //0=normal 1=BdayHat 2=ghost 3=XmasSweater 4=bunnyEars 5=pumpkinHead
 		else
-		SetEntProp(chickens[client_index], Prop_Send, "m_nBody", serverHat[client_index]);
+			SetEntProp(chickens[client_index], Prop_Send, "m_nBody", serverHat[client_index]);
 		//Teleports the chicken at the player's feet
 		float pos[3];
 		GetClientAbsOrigin(client_index, pos);
@@ -178,33 +178,22 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 
 void SetRotationLock(int client_index, bool enabled)
 {
-	float nullRot[3];
-	float pos[3];
-	float ang[3];
-	if (enabled)
-	{
-		//Break if reload plugin
-//		SetVariantString("!activator");
-//		AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-
-		//Fixes bug but lags
-		SetVariantString("");
-		AcceptEntityInput(chickens[client_index], "ClearParent");
-		GetClientEyeAngles(client_index, ang);
-		ang[0] = 0.0;
-		ang[2] = 0.0;
-		
-		GetClientAbsOrigin(client_index, pos);
-		TeleportEntity(chickens[client_index], pos, ang, NULL_VECTOR);
-	}
-	else
-	{
-		SetVariantString("");
-		AcceptEntityInput(chickens[client_index], "ClearParent");
-		GetClientAbsOrigin(client_index, pos);
-		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
-	}
-}
+    float nullRot[3];
+    float pos[3];
+    if (enabled)
+    {
+        SetVariantString("!activator");
+        AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
+        GetClientAbsOrigin(client_index, pos);
+        TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+    }
+    else
+    {
+        AcceptEntityInput(chickens[client_index], "SetParent");
+        GetClientAbsOrigin(client_index, pos);
+        TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+    }
+} 
 
 void SetClientSpeed(int client_index, float speed)
 {
@@ -220,10 +209,10 @@ public void SlowPlayerFall(int client_index)
 		float oldSpeed = vel[2];
 		// Player is falling too fast, lets slow him to maxFallSpeed
 		if(vel[2] < maxFallSpeed)
-		vel[2] = maxFallSpeed;
+			vel[2] = maxFallSpeed;
 		// Fallspeed changed
 		if(oldSpeed != vel[2])
-		TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);
+			TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);
 	}
 }
 
@@ -251,7 +240,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 		{
 			flyCounter[client_index]++;
 			if (flyCounter[client_index] == 9)
-			flyCounter[client_index] = 0;
+				flyCounter[client_index] = 0;
 		}
 		//If grounded
 		else if (currentFlags & FL_ONGROUND)
@@ -267,7 +256,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 				SetClientSpeed(client_index, chickenRunSpeed);
 				//PrintToChat(client_index, "Idle");
 			}
-			//if pressing the walk key, is not already walking, is moving, set him walking
+			//if pressing the walk key, is not already walking, is moving, set him walking   
 			else if (isWalking[client_index] && !wasWalking[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[0]); AcceptEntityInput(chickens[client_index], "SetAnimation");
@@ -277,7 +266,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 				SetClientSpeed(client_index, chickenWalkSpeed);
 				//PrintToChat(client_index, "Walking");
 			}
-			//if is not pressing walk, not already running, is moving, set him running
+			//if is not pressing walk, not already running, is moving, set him running     
 			else if (!isWalking[client_index] && !wasRunning[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[1]); AcceptEntityInput(chickens[client_index], "SetAnimation");
@@ -295,7 +284,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 public Action Timer_DestroyParticles(Handle timer, int client_index)
 {
 	if (feathersTimer[client_index] == timer && IsValidEdict(feathersParticles[client_index]))
-	RemoveEdict(feathersParticles[client_index]);
+		RemoveEdict(feathersParticles[client_index]);
 	
 	return Plugin_Handled;
-}
+} 

@@ -117,7 +117,7 @@ public void OnPluginStart()
 	for(int i = 1; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i))
-			OnClientPutInServer(i);
+			OnClientPostAdminCheck(i);
 	}
 	
 	if (lateload)
@@ -216,7 +216,7 @@ public Action Event_InfernoStartBurn(Handle event, const char[] name, bool dontB
 }
 
 
-public void OnClientPutInServer(int client_index)
+public void OnClientPostAdminCheck(int client_index)
 {
 	SDKHook(client_index, SDKHook_PostThinkPost, Hook_OnPostThinkPost);
 	SDKHookEx(client_index, SDKHook_WeaponSwitchPost, Hook_WeaponSwitchPost);
@@ -415,6 +415,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		if (vel[0] < 0)
 		vel[0] = 0.0;
 	}
+	
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
 	isMoving[client_index] = vel[0] > 0.0 || vel[0] < 0.0;

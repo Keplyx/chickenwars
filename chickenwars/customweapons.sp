@@ -1,5 +1,5 @@
 /*
-*   This file is part of Chicken Strike.
+*   This file is part of Chicken Wars.
 *   Copyright (C) 2017  Keplyx
 *
 *   This program is free software: you can redistribute it and/or modify

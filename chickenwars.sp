@@ -516,6 +516,11 @@ public void Hook_OnPostThinkPost(int entity_index)
 	chickenHealth = GetConVarInt(cvar_health);
 	canChooseStyle = GetConVarBool(cvar_player_styles);
 	UpdateChickenCvars(cvar_hats, cvar_skin, cvar_chicken_number, cvar_spawnorigin);
+	int currentFlags = GetEntityFlags(entity_index);
+	if (currentFlags & FL_ONGROUND)
+	{
+		SetClientSpeed(entity_index);
+	}
 }
 
 public void Hook_OnGrenadeThinkPost(int entity_index)

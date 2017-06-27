@@ -239,19 +239,21 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 	}
 	if (StrEqual(classname, "smokegrenade_projectile", false) && GetConVarBool(cvar_customsmoke))
 	{
-		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
+		CreateTimer(0.0, Timer_SetEggGrenade, entity_index);
 	}
 	if (StrEqual(classname, "decoy_projectile", false) && GetConVarBool(cvar_customdecoy))
 	{
-		SDKHook(entity_index, SDKHook_ThinkPost, Hook_OnGrenadeThinkPost);
+		CreateTimer(0.0, Timer_SetEggGrenade, entity_index);
 	}
 	if ((StrEqual(classname, "incgrenade_projectile", false) || StrEqual(classname, "molotov_projectile", false)) && GetConVarBool(cvar_custominc))
 	{
+		CreateTimer(0.0, Timer_SetEggGrenade, entity_index);
 		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
 	}
 	if (StrEqual(classname, "hegrenade_projectile", false) && GetConVarBool(cvar_customhe))
 	{
 		CreateTimer(0.0, Timer_DefuseGrenade, entity_index);
+		CreateTimer(0.0, Timer_SetEggGrenade, entity_index);
 		SDKHook(entity_index, SDKHook_StartTouch, StartTouchHegrenade);
 	}
 }
@@ -398,13 +400,13 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 		return Plugin_Handled;
 	}
 	else
-	return Plugin_Handled;
+		return Plugin_Handled;
 }
 
 public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	if (!IsPlayerAlive(client_index))
-	return Plugin_Continue;
+		return Plugin_Continue;
 	
 	// Disable non-forward movement :3
 	if (vel[1] != 0)
@@ -480,37 +482,38 @@ public void Hook_WeaponSwitchPost(int client_index, int weapon_index)
 	SDKHook(weapon_index, SDKHook_ReloadPost, Hook_WeaponReloadPost);
 }
 
-public void Hook_OnPostThinkPost(int entity_index)
+public Action Timer_SetEggGrenade(Handle timer, int entity_index)
 {
 	//Replace the grenade's model by eggs (thrown and dropped)
-	for (int i = MAXPLAYERS; i <= GetMaxEntities(); i++)
+	if (IsValidEntity(entity_index))
 	{
-		if (IsValidEntity(i))
+		char buffer[128];
+		GetEntityClassname(entity_index, buffer, sizeof(buffer))
+		if (StrEqual(buffer, "smokegrenade_projectile", false) || StrEqual(buffer, "weapon_smokegrenade", false))
 		{
-			char buffer[128];
-			GetEntityClassname(i, buffer, sizeof(buffer))
-			if (StrEqual(buffer, "smokegrenade_projectile", false) || StrEqual(buffer, "weapon_smokegrenade", false))
-			{
-				SetEggGrenade(i, WHITE);
-			}
-			if (StrEqual(buffer, "decoy_projectile", false) || StrEqual(buffer, "weapon_decoy", false))
-			{
-				SetEggGrenade(i, YELLOW);
-			}
-			if (StrEqual(buffer, "tagrenade_projectile", false) || StrEqual(buffer, "weapon_tagrenade", false))
-			{
-				SetEggGrenade(i, PURPLE);
-			}
-			if (StrEqual(buffer, "molotov_projectile", false) || StrEqual(buffer, "incgrenade_projectile", false) || StrEqual(buffer, "weapon_molotov", false) || StrEqual(buffer, "weapon_incgrenade", false))
-			{
-				SetEggGrenade(i, GREEN);
-			}
-			if (StrEqual(buffer, "hegrenade_projectile", false) || StrEqual(buffer, "weapon_hegrenade", false))
-			{
-				SetEggGrenade(i, ORANGE);
-			}
+			SetEggGrenade(entity_index, WHITE);
+		}
+		if (StrEqual(buffer, "decoy_projectile", false) || StrEqual(buffer, "weapon_decoy", false))
+		{
+			SetEggGrenade(entity_index, YELLOW);
+		}
+		if (StrEqual(buffer, "tagrenade_projectile", false) || StrEqual(buffer, "weapon_tagrenade", false))
+		{
+			SetEggGrenade(entity_index, PURPLE);
+		}
+		if (StrEqual(buffer, "molotov_projectile", false) || StrEqual(buffer, "incgrenade_projectile", false) || StrEqual(buffer, "weapon_molotov", false) || StrEqual(buffer, "weapon_incgrenade", false))
+		{
+			SetEggGrenade(entity_index, GREEN);
+		}
+		if (StrEqual(buffer, "hegrenade_projectile", false) || StrEqual(buffer, "weapon_hegrenade", false))
+		{
+			SetEggGrenade(entity_index, ORANGE);
 		}
 	}
+}
+
+public void Hook_OnPostThinkPost(int entity_index)
+{
 	SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
 	//Update convars for other files
 	chickenHealth = GetConVarInt(cvar_health);

@@ -222,6 +222,9 @@ public void OnClientPostAdminCheck(int client_index)
 	SDKHookEx(client_index, SDKHook_WeaponSwitchPost, Hook_WeaponSwitchPost);
 	//Displays the welcome message 3 sec after player's connection so he can see it
 	CreateTimer(3.0, Timer_WelcomeMessage, client_index);
+	//Disable footsteps
+	if (!IsFakeClient(client_index))
+		SendConVarValue(client_index, FindConVar("sv_footsteps"), "0");
 }
 
 public void OnClientDisconnect(int client_index)

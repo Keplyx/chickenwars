@@ -87,9 +87,6 @@ public void IntiCvars()
 	//Enable hiding of players
 	SetConVarBool(FindConVar("sv_disable_immunity_alpha"), true);
 	
-	//Disable footsteps
-	SetConVarFloat(FindConVar("sv_footstep_sound_frequency"), 500.0);
-	
 	//Disable the event if any (easter, halloween, xmas...)
 	SetConVarBool(FindConVar("sv_holiday_mode"), false);
 	SetConVarBool(FindConVar("sv_party_mode"), false);

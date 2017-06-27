@@ -37,7 +37,6 @@
 *
 *   Reload while ammo full //Y U DO DIS
 *   Foot shadow under chicken (client side thirdperson only) // Does it really need a fix?
-*	Buying an usp will give you a p2000 if you equipped it in the game loadout
 *
 */
 
@@ -298,7 +297,7 @@ public Action Timer_WelcomeMessage(Handle timer, int client_index)
 		//Welcome message (white text in red box)
 		CPrintToChat(client_index, "{darkred}********************************");
 		CPrintToChat(client_index, "{darkred}* {default}Welcome to Chicken Wars");
-		CPrintToChat(client_index, "{darkred}*            {default}Made by Keplyx");
+		CPrintToChat(client_index, "{darkred}*            {default}Made by {lime}Keplyx");
 		CPrintToChat(client_index, "{darkred}********************************");
 	}
 }

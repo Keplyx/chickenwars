@@ -63,7 +63,7 @@ if (IsClientInGame( % 1) && !IsFakeClient( % 1))
 	#define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
 	
-	#define VERSION "1.1.3"
+	#define VERSION "1.2.0"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12

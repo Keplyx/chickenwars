@@ -1,17 +1,17 @@
 /*
-*   This file is part of Chicken Strike.
+*   This file is part of Chicken Wars.
 *   Copyright (C) 2017  Keplyx
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*   
+*
 *   This program is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *   GNU General Public License for more details.
-*   
+*
 *   You should have received a copy of the GNU General Public License
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -25,13 +25,15 @@ char chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUMP", "ACT_GLI
 
 //fake models arrray
 int chickens[MAXPLAYERS + 1];
-
+bool isChicken[MAXPLAYERS + 1];
 //Timers
 Handle animationsTimer[MAXPLAYERS + 1];
 Handle feathersTimer[MAXPLAYERS + 1];
 
 int feathersParticles[MAXPLAYERS + 1];
 int lastFlags[MAXPLAYERS + 1];
+
+char playersModels[MAXPLAYERS + 1][PLATFORM_MAX_PATH];
 
 //Animation related variables
 bool wasIdle[MAXPLAYERS + 1] = false;
@@ -52,8 +54,8 @@ int chickenHealth = 15;
 bool canChooseStyle = true;
 
 //Chicken constants
-const float chickenRunSpeed = 0.36; //Match real chicken speed (kind of)  
-const float chickenWalkSpeed = 0.12;
+const float chickenRunSpeed = 102.0; //Match real chicken run speed (kind of)
+const float chickenWalkSpeed = 6.5; //Match real chicken walk speed (kind of)
 const float maxFallSpeed = -100.0;
 
 void InitPlayersStyles() //Set skins/hats to server sided for everyone
@@ -73,15 +75,19 @@ void ResetPlayerStyle(int client_index) //Set a player's skin/hat to server side
 
 void SetChicken(int client_index)
 {
+	isChicken[client_index] = true;
 	//Delete fake model to prevent glitches
 	DisableFakeModel(client_index);
+	
+	// Get player model to revert it on chicken disable
+	char modelName[PLATFORM_MAX_PATH];
+	GetEntPropString(client_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
+	playersModels[client_index] = modelName;
 	
 	//Only for hitbox -> Collision hull still the same
 	SetEntityModel(client_index, chickenModel);
 	//Little chicken is weak
 	SetEntityHealth(client_index, chickenHealth);
-	//Little chicken has little legs
-	SetClientSpeed(client_index, chickenRunSpeed); //Changed based on animation
 	//Hide the real player model (because animations won't play)
 	//SDKHook(client_index, SDKHook_SetTransmit, Hook_SetTransmit); //Crash server
 	SetEntityRenderMode(client_index, RENDER_NONE); //Make sure immunity alpha is set to 0 or it won't work
@@ -106,14 +112,11 @@ void CreateFakeModel(int client_index)
 		else
 			SetEntProp(chickens[client_index], Prop_Send, "m_nBody", serverHat[client_index]);
 		//Teleports the chicken at the player's feet
-		float pos[3];
-		GetClientAbsOrigin(client_index, pos);
-		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+		
 		//Parents the chicken to the player and attaches it
 		SetVariantString("!activator"); AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-		//Reset rotation
-		float nullRot[3];
-		TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+		float nullPos[3], nullRot[3];
+		TeleportEntity(chickens[client_index], nullPos, nullRot, NULL_VECTOR);
 		//Keep player's hitbox, disable collisions for the fake chicken
 		DispatchKeyValue(chickens[client_index], "solid", "0");
 		//Spawn the chicken!
@@ -128,12 +131,12 @@ void CreateFakeModel(int client_index)
 
 void DisableChicken(int client_index)
 {
+	isChicken[client_index] = false;
 	//Reset player's properties, stop animations
-	SetClientSpeed(client_index, 1.0);
 	SetEntityRenderMode(client_index, RENDER_NORMAL);
 	if (animationsTimer[client_index] != INVALID_HANDLE)
 	{
-		CloseHandle(animationsTimer[client_index]);
+		KillTimer(animationsTimer[client_index]);
 		animationsTimer[client_index] = INVALID_HANDLE;
 	}
 	
@@ -145,6 +148,8 @@ void DisableChicken(int client_index)
 	DisableFakeModel(client_index);
 	DeleteFakeWeapon(client_index);
 	ChickenDeath(client_index);
+	SetEntityModel(client_index, playersModels[client_index]);
+	SetEntityHealth(client_index, 100);
 }
 
 void DisableFakeModel(int client_index)
@@ -178,26 +183,43 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 
 void SetRotationLock(int client_index, bool enabled)
 {
-    float nullRot[3];
-    float pos[3];
-    if (enabled)
-    {
-        SetVariantString("!activator");
-        AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-        GetClientAbsOrigin(client_index, pos);
-        TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
-    }
-    else
-    {
-        AcceptEntityInput(chickens[client_index], "SetParent");
-        GetClientAbsOrigin(client_index, pos);
-        TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
-    }
-} 
+	float nullRot[3];
+	float pos[3];
+	if (enabled)
+	{
+		SetVariantString("!activator");
+		AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
+		GetClientAbsOrigin(client_index, pos);
+		TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+	}
+	else
+	{
+		AcceptEntityInput(chickens[client_index], "SetParent");
+		GetClientAbsOrigin(client_index, pos);
+		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+	}
+}
 
-void SetClientSpeed(int client_index, float speed)
+public void SetClientSpeed(int client_index)
 {
-	SetEntPropFloat(client_index, Prop_Send, "m_flLaggedMovementValue", speed); //reduce player's speed (including falling speed)
+	float vel[3];
+	float factor;
+	GetEntPropVector(client_index, Prop_Data, "m_vecVelocity", vel);
+	float velNorm = SquareRoot(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]);
+	if (isWalking[client_index] && velNorm > chickenWalkSpeed)
+		factor = chickenWalkSpeed;
+	else if (!isWalking[client_index] && velNorm > chickenRunSpeed)
+		factor = chickenRunSpeed;
+	
+	for (int i = 0; i < sizeof(vel); i++)
+	{
+		if (factor > 0.0)
+		{
+			vel[i] /= velNorm;
+			vel[i] *= factor;
+		}
+	}
+	TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);
 }
 
 public void SlowPlayerFall(int client_index)
@@ -207,11 +229,9 @@ public void SlowPlayerFall(int client_index)
 	if (vel[2] < 0.0)
 	{
 		float oldSpeed = vel[2];
-		
-		// Player is falling to fast, lets slow him to maxFallSpeed
+		// Player is falling too fast, lets slow him to maxFallSpeed
 		if(vel[2] < maxFallSpeed)
 			vel[2] = maxFallSpeed;
-		
 		// Fallspeed changed
 		if(oldSpeed != vel[2])
 			TeleportEntity(client_index, NULL_VECTOR, NULL_VECTOR, vel);
@@ -234,7 +254,6 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 			wasIdle[client_index] = false;
 			wasWalking[client_index] = false;
 			flyCounter[client_index]++;
-			SetClientSpeed(client_index, chickenRunSpeed);
 			//PrintToChat(client_index, "Falling");
 		}
 		//If flying, count time passed
@@ -255,27 +274,24 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 				wasRunning[client_index] = false;
 				wasIdle[client_index] = true;
 				wasWalking[client_index] = false;
-				SetClientSpeed(client_index, chickenRunSpeed);
 				//PrintToChat(client_index, "Idle");
 			}
-			//if pressing the walk key, is not already walking, is moving, set him walking   
+			//if pressing the walk key, is not already walking, is moving, set him walking
 			else if (isWalking[client_index] && !wasWalking[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[0]); AcceptEntityInput(chickens[client_index], "SetAnimation");
 				wasRunning[client_index] = false;
 				wasIdle[client_index] = false;
 				wasWalking[client_index] = true;
-				SetClientSpeed(client_index, chickenWalkSpeed);
 				//PrintToChat(client_index, "Walking");
 			}
-			//if is not pressing walk, not already running, is moving, set him running     
+			//if is not pressing walk, not already running, is moving, set him running
 			else if (!isWalking[client_index] && !wasRunning[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[1]); AcceptEntityInput(chickens[client_index], "SetAnimation");
 				wasRunning[client_index] = true;
 				wasIdle[client_index] = false;
 				wasWalking[client_index] = false;
-				SetClientSpeed(client_index, chickenRunSpeed);
 				//PrintToChat(client_index, "Running");
 			}
 		}
@@ -289,4 +305,4 @@ public Action Timer_DestroyParticles(Handle timer, int client_index)
 		RemoveEdict(feathersParticles[client_index]);
 	
 	return Plugin_Handled;
-} 
+}

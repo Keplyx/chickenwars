@@ -1,17 +1,17 @@
 /*
-*   This file is part of Chicken Strike.
+*   This file is part of Chicken Wars.
 *   Copyright (C) 2017  Keplyx
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*   
+*
 *   This program is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *   GNU General Public License for more details.
-*   
+*
 *   You should have received a copy of the GNU General Public License
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -36,6 +36,8 @@ ConVar cvar_customhe = null;
 ConVar cvar_custombuymenu = null;
 ConVar cvar_prices[sizeof(itemNames)];
 ConVar cvar_ffa = null;
+
+ConVar cvar_trans_onspawn = null;
 
 public void CreateConVars(char[] version)
 {
@@ -75,6 +77,9 @@ public void CreateConVars(char[] version)
 	
 	cvar_ffa = CreateConVar("cw_ffa", "0", "Set whether to enable Free For All mode.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_ffa.AddChangeHook(SetFFA);
+	
+	cvar_trans_onspawn = CreateConVar("cw_trans_onspawn", "1", "Set whether to transform players into chickens on spawn.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	
 	AutoExecConfig(true, "chickenwars");
 }
 
@@ -87,11 +92,9 @@ public void IntiCvars()
 	//Enable hiding of players
 	SetConVarBool(FindConVar("sv_disable_immunity_alpha"), true);
 	
-	//Disable footsteps
-	SetConVarFloat(FindConVar("sv_footstep_sound_frequency"), 500.0);
-	
 	//Disable the event if any (easter, halloween, xmas...)
 	SetConVarBool(FindConVar("sv_holiday_mode"), false);
+	SetConVarBool(FindConVar("sv_party_mode"), false);
 	//Set player weapon
 	SetConVarString(FindConVar("mp_t_default_secondary"), "weapon_p250");
 	SetConVarString(FindConVar("mp_ct_default_secondary"), "weapon_p250");
@@ -101,6 +104,21 @@ public void IntiCvars()
 	SetConVarInt(FindConVar("ammo_item_limit_healthshot"), 1);
 	// Prevents players from being kicked for killing chickens
 	SetConVarBool(FindConVar("mp_autokick"), false);
+}
+
+public void ResetCvars()
+{
+	ResetConVar(FindConVar("mp_teamname_1"));
+	ResetConVar(FindConVar("mp_teamname_2"));
+	ResetConVar(FindConVar("sv_disable_immunity_alpha"));
+	ResetConVar(FindConVar("sv_footstep_sound_frequency"));
+	ResetConVar(FindConVar("sv_holiday_mode"));
+	ResetConVar(FindConVar("sv_party_mode"));
+	ResetConVar(FindConVar("mp_t_default_secondary"));
+	ResetConVar(FindConVar("mp_ct_default_secondary"));
+	ResetConVar(FindConVar("healthshot_health"));
+	ResetConVar(FindConVar("ammo_item_limit_healthshot"));
+	ResetConVar(FindConVar("mp_autokick"));
 }
 
 public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)
@@ -117,7 +135,7 @@ public void SetFFA(ConVar convar, char[] oldValue, char[] newValue)
 	{
 		ResetConVar(FindConVar("mp_dm_time_between_bonus_max"));
 		ResetConVar(FindConVar("mp_dm_time_between_bonus_min"));
-		SetConVarBool(FindConVar("mp_teammates_are_enemies"), false);
+		ResetConVar(FindConVar("mp_teammates_are_enemies"));
 	}
 	ServerCommand("mp_restartgame 1");
 }
@@ -128,4 +146,8 @@ public void RegisterCommands()
 	RegConsoleCmd("cw_set_skin", SetChickenSkin);
 	RegConsoleCmd("cw_set_hat", SetChickenHat);
 	RegAdminCmd("cw_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_disableall", DisableAll, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_enableall", EnableAll, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_disable", DisableOne, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_enable", EnableOne, ADMFLAG_GENERIC);
 }

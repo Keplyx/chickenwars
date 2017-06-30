@@ -1,0 +1,8 @@
+[Project]
+bfcb528a-03c5-4192-a923-05e48a154213=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars.sp
+2dc07720-a54d-4e09-ab73-e318569ec16d=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/chickenplayer.sp
+b379e040-5a43-4150-a05e-3f387fb3a523=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/chickenmanager.sp
+11c90cec-d40e-4fa2-8b5b-f57490b29815=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/customweapons.sp
+c2e060f6-3896-4d8d-a504-268b00efd520=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/weapons.sp
+e24192fe-e21a-492e-b13c-6730dc0bae54=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/menus.sp
+18114270-7fee-41fa-ab83-8e043c42b29f=/home/keplyx/Documents/Sourcemod/chickenwars/chickenwars/init.sp

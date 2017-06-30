@@ -1,17 +1,17 @@
 /*
-*   This file is part of Chicken Strike.
+*   This file is part of Chicken Wars.
 *   Copyright (C) 2017  Keplyx
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*   
+*
 *   This program is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *   GNU General Public License for more details.
-*   
+*
 *   You should have received a copy of the GNU General Public License
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -19,9 +19,9 @@
 #define IDLE "#idle"
 #define PANIC "#panic"
 
-char itemNames[][] = {"weapon_hkp2000", "weapon_ssg08", "weapon_smokegrenade", "weapon_decoy", "weapon_tagrenade", "weapon_molotov", "weapon_hegrenade", "weapon_healthshot"};
+char itemNames[][] = {"weapon_usp_silencer", "weapon_ssg08", "weapon_smokegrenade", "weapon_decoy", "weapon_tagrenade", "weapon_molotov", "weapon_hegrenade", "weapon_healthshot"};
 char displayNames[][] = {"usp-s", "ssg08", "Chicken Spawner", "Bait", "Detector", "Zombie Egg", "Kamikaze","Health Buff"};
-int itemPrices[sizeof(itemNames)]; 
+int itemPrices[sizeof(itemNames)];
 int itemsBrought[MAXPLAYERS + 1][sizeof(itemNames)];
 
 char chickenIdleSounds[][] =  { "ambient/creatures/chicken_idle_01.wav", "ambient/creatures/chicken_idle_02.wav", "ambient/creatures/chicken_idle_03.wav" }
@@ -40,7 +40,7 @@ public void UpdatePrices(Handle[] prices, bool isFFA)
 			itemPrices[i] = GetConVarInt(prices[i]);
 		else
 			itemPrices[i] = 0;
-	}	
+	}
 }
 
 public void Menu_Taunt(int client_index, int args)
@@ -111,9 +111,9 @@ public int MenuHandler_Taunt(Menu menu, MenuAction action, int param1, int param
 		char buffer[64];
 		menu.GetItem(params, buffer, sizeof(buffer));
 		if (StrEqual(buffer, IDLE))
-		PlayRandomIdleSound(param1);
+			PlayRandomIdleSound(param1);
 		else if (StrEqual(buffer, PANIC))
-		PlayRandomPanicSound(param1);
+			PlayRandomPanicSound(param1);
 	}
 	else if (action == MenuAction_End)
 	{
@@ -130,7 +130,7 @@ public int MenuHandler_Buy(Menu menu, MenuAction action, int param1, int params)
 		BuyWeapon(param1, buffer);
 	}
 	else if (action == MenuAction_End && IsValidClient(param1))
-	delete playerMenus[param1];
+		delete playerMenus[param1];
 }
 
 void BuyWeapon(int client_index, char[] weapon_classname) //Buy weapon if not already bought and have enough money

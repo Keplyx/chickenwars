@@ -65,6 +65,10 @@ If you do not own a server yet, I recommend using **[csgosl](https://github.com/
 
     Admin only:
     "cw_strip_weapons" (Removes all weapons from a specific player)
+    "cw_disableall" (Set every player to Human)
+    "cw_enableall" (Set every player to Chicken)
+    "cw_disable <PLAYER>" (Set specified player to Human)
+    "cw_enable <PLAYER>" (Set specified player to Chicken)
 
 ## Media
 

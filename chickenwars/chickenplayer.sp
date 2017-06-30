@@ -25,13 +25,15 @@ char chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUMP", "ACT_GLI
 
 //fake models arrray
 int chickens[MAXPLAYERS + 1];
-
+bool isChicken[MAXPLAYERS + 1];
 //Timers
 Handle animationsTimer[MAXPLAYERS + 1];
 Handle feathersTimer[MAXPLAYERS + 1];
 
 int feathersParticles[MAXPLAYERS + 1];
 int lastFlags[MAXPLAYERS + 1];
+
+char playersModels[MAXPLAYERS + 1][PLATFORM_MAX_PATH];
 
 //Animation related variables
 bool wasIdle[MAXPLAYERS + 1] = false;
@@ -73,8 +75,14 @@ void ResetPlayerStyle(int client_index) //Set a player's skin/hat to server side
 
 void SetChicken(int client_index)
 {
+	isChicken[client_index] = true;
 	//Delete fake model to prevent glitches
 	DisableFakeModel(client_index);
+	
+	// Get player model to revert it on chicken disable
+	char modelName[PLATFORM_MAX_PATH];
+	GetEntPropString(client_index, Prop_Data, "m_ModelName", modelName, sizeof(modelName));
+	playersModels[client_index] = modelName;
 	
 	//Only for hitbox -> Collision hull still the same
 	SetEntityModel(client_index, chickenModel);
@@ -104,14 +112,11 @@ void CreateFakeModel(int client_index)
 		else
 			SetEntProp(chickens[client_index], Prop_Send, "m_nBody", serverHat[client_index]);
 		//Teleports the chicken at the player's feet
-		float pos[3];
-		GetClientAbsOrigin(client_index, pos);
-		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+		
 		//Parents the chicken to the player and attaches it
 		SetVariantString("!activator"); AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-		//Reset rotation
-		float nullRot[3];
-		TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+		float nullPos[3], nullRot[3];
+		TeleportEntity(chickens[client_index], nullPos, nullRot, NULL_VECTOR);
 		//Keep player's hitbox, disable collisions for the fake chicken
 		DispatchKeyValue(chickens[client_index], "solid", "0");
 		//Spawn the chicken!
@@ -126,11 +131,12 @@ void CreateFakeModel(int client_index)
 
 void DisableChicken(int client_index)
 {
+	isChicken[client_index] = false;
 	//Reset player's properties, stop animations
 	SetEntityRenderMode(client_index, RENDER_NORMAL);
 	if (animationsTimer[client_index] != INVALID_HANDLE)
 	{
-		CloseHandle(animationsTimer[client_index]);
+		KillTimer(animationsTimer[client_index]);
 		animationsTimer[client_index] = INVALID_HANDLE;
 	}
 	
@@ -142,6 +148,8 @@ void DisableChicken(int client_index)
 	DisableFakeModel(client_index);
 	DeleteFakeWeapon(client_index);
 	ChickenDeath(client_index);
+	SetEntityModel(client_index, playersModels[client_index]);
+	SetEntityHealth(client_index, 100);
 }
 
 void DisableFakeModel(int client_index)

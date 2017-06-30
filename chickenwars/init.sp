@@ -37,6 +37,8 @@ ConVar cvar_custombuymenu = null;
 ConVar cvar_prices[sizeof(itemNames)];
 ConVar cvar_ffa = null;
 
+ConVar cvar_trans_onspawn = null;
+
 public void CreateConVars(char[] version)
 {
 	CreateConVar("chickenwars_version", version, "Chicken Strike", FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DONTRECORD);
@@ -75,6 +77,9 @@ public void CreateConVars(char[] version)
 	
 	cvar_ffa = CreateConVar("cw_ffa", "0", "Set whether to enable Free For All mode.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	cvar_ffa.AddChangeHook(SetFFA);
+	
+	cvar_trans_onspawn = CreateConVar("cw_trans_onspawn", "1", "Set whether to transform players into chickens on spawn.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+	
 	AutoExecConfig(true, "chickenwars");
 }
 
@@ -141,4 +146,8 @@ public void RegisterCommands()
 	RegConsoleCmd("cw_set_skin", SetChickenSkin);
 	RegConsoleCmd("cw_set_hat", SetChickenHat);
 	RegAdminCmd("cw_strip_weapons", StripWeapons, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_disableall", DisableAll, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_enableall", EnableAll, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_disable", DisableOne, ADMFLAG_GENERIC);
+	RegAdminCmd("cw_enable", EnableOne, ADMFLAG_GENERIC);
 }

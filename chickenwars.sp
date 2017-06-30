@@ -54,17 +54,17 @@
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
 
 #define LoopClients(%1) for(int %1 = 1; %1 <= MaxClients; %1++)
-
-#define LoopIngameClients(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
+	
+	#define LoopIngameClients(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1))
-
-#define LoopIngamePlayers(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
+	
+	#define LoopIngamePlayers(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1) && !IsFakeClient( % 1))
-
-#define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
+	
+	#define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
 if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
-
-#define VERSION "1.1.3"
+	
+	#define VERSION "1.1.3"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12
@@ -109,10 +109,6 @@ public void OnPluginStart()
 	collisionOffsets = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
 	InitPlayersStyles();
 	
-	//Throws Error
-	//LoopIngameClients(i)
-	//	OnClientPostAdminCheck(i);
-	
 	for(int i = 1; i <= MaxClients; i++)
 	{
 		if (IsValidClient(i) && !IsFakeClient(i))
@@ -129,7 +125,7 @@ public void OnPluginEnd()
 	RemoveChickens();
 	for(int i = 1; i <= MaxClients; i++)
 	{
-		if (IsValidClient(i))
+		if (IsValidClient(i) && isChicken[i])
 			DisableChicken(i);
 	}
 	ServerCommand("mp_restartgame 1");
@@ -147,7 +143,7 @@ public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM
 		char sClassname[64];
 		GetEntityClassname(entity, sClassname, sizeof(sClassname));
 		if (StrContains(sClassname, "_projectile") != -1)
-		return Plugin_Stop;
+			return Plugin_Stop;
 	}
 	
 	return Plugin_Continue;
@@ -156,7 +152,8 @@ public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
 	int victim = GetClientOfUserId(GetEventInt(event, "userid"));
-	DisableChicken(victim);
+	if (isChicken[victim])
+		DisableChicken(victim);
 	if (GetConVarBool(cvar_ffa))
 		ClosePlayerBuyMenu(victim);
 }
@@ -164,19 +161,23 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
 	int client_index = GetClientOfUserId(GetEventInt(event, "userid"));
+	
+	if (GetConVarBool(cvar_trans_onspawn))
+	{
+		//Transformation!!
+		SetChicken(client_index);
+		CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
+	}
 	//Get player's viewmodel for future hiding
 	clientsViewmodels[client_index] = GetViewModelIndex(client_index);
 	//Set player server sided skins
 	serverSkin[client_index] = GetChickenSkin();
 	serverHat[client_index] = GetChickenHat();
-	//Transformation!!
-	SetChicken(client_index);
 	//Remove player collisions
 	SetEntData(client_index, collisionOffsets, 2, 1, true);
 	//Reset the chicken killed count
 	chickenKilledCounter[client_index] = 0;
 	
-	CreateTimer(0.0, Timer_RemoveRadar, GetClientUserId(client_index));
 	canBuy[client_index] = true;
 	if (GetConVarBool(cvar_ffa)){
 		ResetClientItems(client_index);
@@ -188,16 +189,17 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 public void Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client_index = GetClientOfUserId(GetEventInt(event, "userid"));
-	DisableChicken(client_index);
+	if (isChicken[client_index])
+		DisableChicken(client_index);
 }
 
 public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	SpawnChickens();
 	ResetAllItems();
-	if (GetConVarInt(cvar_custombuymenu) > 0){
+	if (GetConVarInt(cvar_custombuymenu) > 0)
 		CPrintToChatAll("{yellow}Open the buy menu bu pressing {white}[MOVELEFT]{yellow}. Available for {white}%d s", GetConVarInt(cvar_custombuymenu));
-	}
+	
 	//Setup buy menu
 	canBuyAll = true;
 	if (!GetConVarBool(cvar_ffa))
@@ -228,7 +230,8 @@ public void OnClientPostAdminCheck(int client_index)
 
 public void OnClientDisconnect(int client_index)
 {
-	DisableChicken(client_index);
+	if (isChicken[client_index])
+		DisableChicken(client_index);
 	ResetPlayerStyle(client_index);
 	ResetClientItems(client_index);
 }
@@ -262,8 +265,8 @@ public void OnEntityCreated(int entity_index, const char[] classname)
 
 public Action StartTouchHegrenade(int iEntity, int iEntity2)
 {
-    int iRef = EntIndexToEntRef(iEntity);
-    CreateTimer(1.0, Timer_CreateExpChicken, iRef);
+	int iRef = EntIndexToEntRef(iEntity);
+	CreateTimer(1.0, Timer_CreateExpChicken, iRef);
 }
 
 public Action Timer_CreateExpChicken(Handle timer, any ref)
@@ -287,7 +290,7 @@ public Action Timer_DefuseGrenade(Handle timer, any ref)
 {
 	int ent = EntRefToEntIndex(ref);
 	if (ent != INVALID_ENT_REFERENCE)
-	SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
+		SetEntProp(ent, Prop_Data, "m_nNextThinkTick", -1);
 }
 
 public Action Timer_WelcomeMessage(Handle timer, int client_index)
@@ -305,7 +308,7 @@ public Action Timer_WelcomeMessage(Handle timer, int client_index)
 public Action Timer_RemoveRadar(Handle timer, any userid) {
 	int client_index = GetClientOfUserId(userid);
 	if (GetConVarBool(cvar_hideradar) && IsValidClient(client_index))
-	SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
+		SetEntProp(client_index, Prop_Send, "m_iHideHUD", ENT_RADAR);
 }
 
 public Action Timer_BuyMenu(Handle timer, any userid) {
@@ -379,7 +382,7 @@ public Action SetChickenSkin(int client_index, int args) //Set player skin if au
 		return Plugin_Handled;
 	}
 	else
-	return Plugin_Handled;
+		return Plugin_Handled;
 }
 
 public Action SetChickenHat(int client_index, int args) //Set player hat if authorized
@@ -405,28 +408,139 @@ public Action SetChickenHat(int client_index, int args) //Set player hat if auth
 		return Plugin_Handled;
 }
 
+public Action DisableAll(int client_index, int args) //Set player hat if authorized
+{
+	for (int i = 0; i <= MAXPLAYERS; i++)
+	{
+		if (isChicken[client_index])
+			DisableChicken(client_index);
+	}
+	return Plugin_Handled;
+}
+
+public Action DisableOne(int client_index, int args) //Set player hat if authorized
+{
+	if (args < 1)
+	{
+		PrintToConsole(client_index, "Usage: cw_disable <PLAYER>");
+		PrintToConsole(client_index, "Disable chicken mode for <PLAYER>");
+		return Plugin_Handled;
+	}
+	
+	char name[32];
+	GetCmdArg(1, name, sizeof(name));
+	int target = CheckTarget(name)
+	if (target == -1)
+	{
+		DisplayAvailablePlayers(client_index, name);
+		return Plugin_Handled;
+	}
+	if (isChicken[client_index])
+	{
+		DisableChicken(target);
+		PrintToConsole(client_index, "Chicken mode disabled for \"%s\"", name);
+		CPrintToChat(target, "{green}You are now Human!");
+	}
+	else
+		PrintToConsole(client_index, "\"%s\" is already human", name);
+	return Plugin_Handled;
+}
+
+public Action EnableAll(int client_index, int args) //Set player hat if authorized
+{
+	for (int i = 0; i <= MAXPLAYERS; i++)
+	{
+		if (!isChicken[client_index])
+			SetChicken(client_index);
+	}
+	return Plugin_Handled;
+}
+
+public Action EnableOne(int client_index, int args) //Set player hat if authorized
+{
+	if (args < 1)
+	{
+		PrintToConsole(client_index, "Usage: cw_enable <PLAYER>");
+		PrintToConsole(client_index, "Enable chicken mode for <PLAYER>");
+		return Plugin_Handled;
+	}
+	
+	char name[32];
+	GetCmdArg(1, name, sizeof(name));
+	int target = CheckTarget(name)
+	if (target == -1)
+	{
+		DisplayAvailablePlayers(client_index, name);
+		return Plugin_Handled;
+	}
+	if (!isChicken[client_index])
+	{
+		SetChicken(target);
+		PrintToConsole(client_index, "Chicken mode enabled for \"%s\"", name);
+		CPrintToChat(target, "{green}You are now a Chicken!");
+	}
+	else
+		PrintToConsole(client_index, "\"%s\" is already a chicken", name);
+	return Plugin_Handled;
+}
+
+int CheckTarget(char name[32])
+{
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (!IsClientConnected(i))
+		{
+			continue;
+		}
+		char other[32];
+		GetClientName(i, other, sizeof(other));
+		if (StrEqual(name, other))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void DisplayAvailablePlayers(int client_index, char[] name)
+{
+	PrintToConsole(client_index, "Could not find any player with the name: \"%s\"", name);
+	PrintToConsole(client_index, "Available players:");
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (!IsClientConnected(i))
+		{
+			continue;
+		}
+		char player[32];
+		GetClientName(i, player, sizeof(player));
+		PrintToConsole(client_index, "\"%s\"", player);
+	}
+}
+
 public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	if (!IsPlayerAlive(client_index))
+	if (!IsPlayerAlive(client_index) || !isChicken[client_index])
 		return Plugin_Continue;
+	
 	
 	// Disable non-forward movement :3
 	if (vel[1] != 0)
-	vel[1] = 0.0;
+		vel[1] = 0.0;
 	//Block backward movement if +use is not pressed
 	if (!(buttons & IN_USE))
 	{
 		if (vel[0] < 0)
-		vel[0] = 0.0;
+			vel[0] = 0.0;
 	}
 	
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
 	isMoving[client_index] = vel[0] > 0.0 || vel[0] < 0.0;
 	if (isMoving[client_index] || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
-	SetRotationLock(client_index, true);
+		SetRotationLock(client_index, true);
 	else
-	SetRotationLock(client_index, false);
+		SetRotationLock(client_index, false);
 	
 	if ((buttons & IN_JUMP) && !(GetEntityFlags(client_index) & FL_ONGROUND))
 	{
@@ -449,7 +563,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 		
 		int knife = GetPlayerWeaponSlot(client_index, CS_SLOT_KNIFE)
 		if (knife > 0)
-		SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
+			SetEntPropFloat(knife, Prop_Send, "m_flNextPrimaryAttack", fUnlockTime);
 	}
 	
 	// Commands
@@ -468,20 +582,20 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 
 public void Hook_WeaponSwitchPost(int client_index, int weapon_index)
 {
-	if (GetEntityRenderMode(client_index) == RENDER_NONE)
+	if (isChicken[client_index])
 	{
 		//Hide the real weapon (which can't be moved because of the bonemerge attribute in the model) and creates a fake one, moved to the chicken's side
 		SetWeaponVisibility(client_index, weapon_index, false);
 		CreateFakeWeapon(client_index, weapon_index);
+		GetCurrentWeaponName(client_index, weapon_index);
+		DisplaySwitching(client_index); //Displayer weapon switching to warn players
+		SDKHook(weapon_index, SDKHook_ReloadPost, Hook_WeaponReloadPost);
 	}
 	else
 	{
 		//If player is visible (not a chicken??) make his weapons visible and don't create a fake one
 		SetWeaponVisibility(client_index, weapon_index, true);
 	}
-	GetCurrentWeaponName(client_index, weapon_index);
-	DisplaySwitching(client_index); //Displayer weapon switching to warn players
-	SDKHook(weapon_index, SDKHook_ReloadPost, Hook_WeaponReloadPost);
 }
 
 public Action Timer_SetEggGrenade(Handle timer, int entity_index)
@@ -516,15 +630,18 @@ public Action Timer_SetEggGrenade(Handle timer, int entity_index)
 
 public void Hook_OnPostThinkPost(int entity_index)
 {
-	SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
-	//Update convars for other files
-	chickenHealth = GetConVarInt(cvar_health);
-	canChooseStyle = GetConVarBool(cvar_player_styles);
-	UpdateChickenCvars(cvar_hats, cvar_skin, cvar_chicken_number, cvar_spawnorigin);
-	int currentFlags = GetEntityFlags(entity_index);
-	if (currentFlags & FL_ONGROUND)
+	if (IsValidClient(entity_index) && isChicken[entity_index])
 	{
-		SetClientSpeed(entity_index);
+		SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
+		//Update convars for other files
+		chickenHealth = GetConVarInt(cvar_health);
+		canChooseStyle = GetConVarBool(cvar_player_styles);
+		UpdateChickenCvars(cvar_hats, cvar_skin, cvar_chicken_number, cvar_spawnorigin);
+		int currentFlags = GetEntityFlags(entity_index);
+		if (currentFlags & FL_ONGROUND)
+		{
+			SetClientSpeed(entity_index);
+		}
 	}
 }
 
@@ -543,9 +660,9 @@ public void Hook_OnGrenadeThinkPost(int entity_index)
 		char buffer[64];
 		GetEntityClassname(entity_index, buffer, sizeof(buffer));
 		if (StrEqual(buffer, "smokegrenade_projectile"))
-		ChickenSmoke(fOrigin);
+			ChickenSmoke(fOrigin);
 		else if (StrEqual(buffer, "decoy_projectile"))
-		ChickenDecoy(client_index, fOrigin, weapons[client_index]);
+			ChickenDecoy(client_index, fOrigin, weapons[client_index]);
 		AcceptEntityInput(entity_index, "Kill");
 	}
 }
@@ -557,24 +674,19 @@ public void Hook_OnChickenThinkPost(int entity_index)
 	{
 		if (IsValidClient(i))
 		{
-			
-			//int owner = GetEntPropEnt(entity_index, Prop_Send, "m_hOwnerEntity");
-			//if (GetClientTeam(i) != GetClientTeam(owner))
-			//{
-				float fOrigin[3];
-				GetClientAbsOrigin(i, fOrigin);
-				float pos[3];
-				GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", pos);
-				bool inside = false;
-				for (int j = 0; j < sizeof(area); j++)
-				{
-					inside = fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j];
-					if (!inside)
-						break;
-				}
-				if (inside)
-					createExplosion(pos);
-			//}
+			float fOrigin[3];
+			GetClientAbsOrigin(i, fOrigin);
+			float pos[3];
+			GetEntPropVector(entity_index, Prop_Send, "m_vecOrigin", pos);
+			bool inside = false;
+			for (int j = 0; j < sizeof(area); j++)
+			{
+				inside = fOrigin[j] < pos[j] + area[j] && fOrigin[j] > pos[j] - area[j];
+				if (!inside)
+					break;
+			}
+			if (inside)
+				createExplosion(pos);
 		}
 	}
 }
@@ -587,7 +699,7 @@ public void createExplosion(float pos[3])
 		TeleportEntity(entity, pos, NULL_VECTOR, NULL_VECTOR);
 		DispatchSpawn(entity);
 		ActivateEntity(entity);
-		DispatchKeyValue(entity, "iMagnitude", "100"); 
+		DispatchKeyValue(entity, "iMagnitude", "100");
 		SetVariantString("!activator");
 		AcceptEntityInput(entity, "Explode", entity, entity);
 		AcceptEntityInput(entity, "Kill");
@@ -650,10 +762,10 @@ public Action Hook_SetTransmit(int entity, int client)
 
 
 stock bool IsValidClient(int client)
-{ 
-    if (client <= 0 || client > MaxClients || !IsClientConnected(client))
-    {
-        return false; 
-    }
-    return IsClientInGame(client); 
-}  
+{
+	if (client <= 0 || client > MaxClients || !IsClientConnected(client))
+	{
+		return false;
+	}
+	return IsClientInGame(client);
+}

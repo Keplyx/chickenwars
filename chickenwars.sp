@@ -629,7 +629,7 @@ public Action Timer_SetEggGrenade(Handle timer, int entity_index)
 
 public void Hook_OnPostThinkPost(int entity_index)
 {
-	if (IsValidClient(entity_index) && isChicken[entity_index])
+	if (IsValidClient(entity_index) && IsClientInGame(entity_index) && isChicken[entity_index])
 	{
 		SetViewModel(entity_index, GetConVarBool(cvar_viewModel)); //Hide viewmodel based on cvar
 		//Update convars for other files

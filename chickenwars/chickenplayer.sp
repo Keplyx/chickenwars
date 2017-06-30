@@ -6,12 +6,12 @@
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*   
+*
 *   This program is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *   GNU General Public License for more details.
-*   
+*
 *   You should have received a copy of the GNU General Public License
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -54,8 +54,8 @@ int chickenHealth = 15;
 bool canChooseStyle = true;
 
 //Chicken constants
-const float chickenRunSpeed = 102.0; //Match real chicken run speed (kind of)  
-const float chickenWalkSpeed = 6.5; //Match real chicken walk speed (kind of)  
+const float chickenRunSpeed = 102.0; //Match real chicken run speed (kind of)
+const float chickenWalkSpeed = 6.5; //Match real chicken walk speed (kind of)
 const float maxFallSpeed = -100.0;
 
 void InitPlayersStyles() //Set skins/hats to server sided for everyone
@@ -183,28 +183,25 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 
 void SetRotationLock(int client_index, bool enabled)
 {
-    float nullRot[3];
-    float pos[3];
-    if (enabled)
-    {
-        SetVariantString("!activator");
-        AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-        GetClientAbsOrigin(client_index, pos);
-        TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
-    }
-    else
-    {
-        AcceptEntityInput(chickens[client_index], "SetParent");
-        GetClientAbsOrigin(client_index, pos);
-        TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
-    }
-} 
+	float nullRot[3];
+	float pos[3];
+	if (enabled)
+	{
+		SetVariantString("!activator");
+		AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
+		GetClientAbsOrigin(client_index, pos);
+		TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+	}
+	else
+	{
+		AcceptEntityInput(chickens[client_index], "SetParent");
+		GetClientAbsOrigin(client_index, pos);
+		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+	}
+}
 
 public void SetClientSpeed(int client_index)
 {
-	if (client_index <= 0 || client_index > MaxClients || !IsClientInGame(client_index))
-		return;
-	
 	float vel[3];
 	float factor;
 	GetEntPropVector(client_index, Prop_Data, "m_vecVelocity", vel);
@@ -213,7 +210,7 @@ public void SetClientSpeed(int client_index)
 		factor = chickenWalkSpeed;
 	else if (!isWalking[client_index] && velNorm > chickenRunSpeed)
 		factor = chickenRunSpeed;
-		
+	
 	for (int i = 0; i < sizeof(vel); i++)
 	{
 		if (factor > 0.0)
@@ -279,7 +276,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 				wasWalking[client_index] = false;
 				//PrintToChat(client_index, "Idle");
 			}
-			//if pressing the walk key, is not already walking, is moving, set him walking   
+			//if pressing the walk key, is not already walking, is moving, set him walking
 			else if (isWalking[client_index] && !wasWalking[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[0]); AcceptEntityInput(chickens[client_index], "SetAnimation");
@@ -288,7 +285,7 @@ public Action Timer_ChickenAnim(Handle timer, int userid) //Must reset falling a
 				wasWalking[client_index] = true;
 				//PrintToChat(client_index, "Walking");
 			}
-			//if is not pressing walk, not already running, is moving, set him running     
+			//if is not pressing walk, not already running, is moving, set him running
 			else if (!isWalking[client_index] && !wasRunning[client_index] && isMoving[client_index])
 			{
 				SetVariantString(chickenSec[1]); AcceptEntityInput(chickens[client_index], "SetAnimation");
@@ -308,4 +305,4 @@ public Action Timer_DestroyParticles(Handle timer, int client_index)
 		RemoveEdict(feathersParticles[client_index]);
 	
 	return Plugin_Handled;
-} 
+}

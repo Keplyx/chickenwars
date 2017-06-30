@@ -202,6 +202,9 @@ void SetRotationLock(int client_index, bool enabled)
 
 public void SetClientSpeed(int client_index)
 {
+	if (client_index <= 0 || client_index > MaxClients || !IsClientInGame(client_index))
+		return;
+	
 	float vel[3];
 	float factor;
 	GetEntPropVector(client_index, Prop_Data, "m_vecVelocity", vel);

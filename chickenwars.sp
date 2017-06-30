@@ -43,11 +43,10 @@
 
 /*  New in this version
 *
-*	Removed loaded message
-*	Forced sv_party_mode 0
-*	Revert cvars on unload
-*	Removed chickens on unload
-*	Fixed invisible players on unload
+*	Improved player speed
+*	Reduced grenade model change performance impact
+*	Added admin commands
+*	Fixed unload/load glitch
 *
 */
 

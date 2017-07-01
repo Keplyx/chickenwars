@@ -1,3 +1,8 @@
+* **Version 1.2.0**
+  * Improved player speed
+  * Reduced grenade model change performance impact
+  * Added admin commands
+  * Fixed unload/load glitch
 * **Version 1.1.3**
   *	Updated custom buy menu message
   * Display custom buy menu message only if enabled

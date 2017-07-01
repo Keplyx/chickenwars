@@ -43,27 +43,14 @@
 
 /*  New in this version
 *
-*	Improved player speed
-*	Reduced grenade model change performance impact
-*	Added admin commands
-*	Fixed unload/load glitch
+*	Fixed console spam "clamped velocity on..."
+*	
 *
 */
 
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
-
-#define LoopClients(%1) for(int %1 = 1; %1 <= MaxClients; %1++)
 	
-	#define LoopIngameClients(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
-if (IsClientInGame( % 1))
-	
-	#define LoopIngamePlayers(%1) for(int %1 = 1; %1 <= MaxClients; ++%1)\
-if (IsClientInGame( % 1) && !IsFakeClient( % 1))
-	
-	#define LoopAlivePlayers(%1) for(int %1 = 1;%1 <= MaxClients; ++%1)\
-if (IsClientInGame( % 1) && IsPlayerAlive( % 1))
-	
-	#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12
@@ -298,7 +285,7 @@ public Action Timer_WelcomeMessage(Handle timer, int client_index)
 	{
 		//Welcome message (white text in red box)
 		CPrintToChat(client_index, "{darkred}********************************");
-		CPrintToChat(client_index, "{darkred}* {default}Welcome to Chicken Wars");
+		CPrintToChat(client_index, "{darkred}* {default}Welcome to {lime}Chicken Wars");
 		CPrintToChat(client_index, "{darkred}*            {default}Made by {lime}Keplyx");
 		CPrintToChat(client_index, "{darkred}********************************");
 	}
@@ -536,7 +523,7 @@ public Action OnPlayerRunCmd(int client_index, int &buttons, int &impulse, float
 	//Change player's animations based on key pressed
 	isWalking[client_index] = (buttons & IN_SPEED) || (buttons & IN_DUCK);
 	isMoving[client_index] = vel[0] > 0.0 || vel[0] < 0.0;
-	if (isMoving[client_index] || (buttons & IN_JUMP) || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
+	if (isMoving[client_index] || IsValidEntity(weapons[client_index]) || !(GetEntityFlags(client_index) & FL_ONGROUND))
 		SetRotationLock(client_index, true);
 	else
 		SetRotationLock(client_index, false);

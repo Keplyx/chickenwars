@@ -16,6 +16,8 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sdktools>
+
 char chickenModel[] = "models/chicken/chicken.mdl";
 char chickenDeathSounds[][] =  { "ambient/creatures/chicken_death_01.wav", "ambient/creatures/chicken_death_02.wav", "ambient/creatures/chicken_death_03.wav" }
 char chickenSec[][] =  { "ACT_WALK", "ACT_RUN", "ACT_IDLE", "ACT_JUMP", "ACT_GLIDE", "ACT_LAND", "ACT_HOP" }
@@ -57,6 +59,8 @@ bool canChooseStyle = true;
 const float chickenRunSpeed = 102.0; //Match real chicken run speed (kind of)
 const float chickenWalkSpeed = 6.5; //Match real chicken walk speed (kind of)
 const float maxFallSpeed = -100.0;
+
+bool wasRotLocked[MAXPLAYERS + 1];
 
 void InitPlayersStyles() //Set skins/hats to server sided for everyone
 {
@@ -145,6 +149,7 @@ void DisableChicken(int client_index)
 	wasRunning[client_index] = false;
 	wasIdle[client_index] = false;
 	wasWalking[client_index] = false;
+	wasRotLocked[client_index] = false;
 	DisableFakeModel(client_index);
 	DeleteFakeWeapon(client_index);
 	ChickenDeath(client_index);
@@ -183,20 +188,20 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 
 void SetRotationLock(int client_index, bool enabled)
 {
-	float nullRot[3];
-	float pos[3];
-	if (enabled)
+	if (enabled && !wasRotLocked)
 	{
-		SetVariantString("!activator");
-		AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
-		GetClientAbsOrigin(client_index, pos);
-		TeleportEntity(chickens[client_index], NULL_VECTOR, nullRot, NULL_VECTOR);
+		SetVariantString("!activator"); AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
+		float nullPos[3], nullRot[3];
+		TeleportEntity(chickens[client_index], nullPos, nullRot, NULL_VECTOR);
+		wasRotLocked[client_index] = true;
 	}
-	else
+	else if (!enabled)
 	{
 		AcceptEntityInput(chickens[client_index], "SetParent");
+		float pos[3];
 		GetClientAbsOrigin(client_index, pos);
 		TeleportEntity(chickens[client_index], pos, NULL_VECTOR, NULL_VECTOR);
+		wasRotLocked[client_index] = false;
 	}
 }
 

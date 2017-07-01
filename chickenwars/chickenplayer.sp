@@ -188,7 +188,7 @@ void ChickenDeath(int client_index) //Fake a chicken's death
 
 void SetRotationLock(int client_index, bool enabled)
 {
-	if (enabled && !wasRotLocked)
+	if (enabled && !wasRotLocked[client_index])
 	{
 		SetVariantString("!activator"); AcceptEntityInput(chickens[client_index], "SetParent", client_index, chickens[client_index], 0);
 		float nullPos[3], nullRot[3];

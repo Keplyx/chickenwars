@@ -44,13 +44,13 @@
 /*  New in this version
 *
 *	Fixed console spam "clamped velocity on..."
-*	
+*	Improved taunt sound fidelity
 *
 */
 
 //Gamemode: Everyone is a chicken (weapons show, exept the knife), in a map full of chickens. Must kill the enemy team
 	
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define PLUGIN_NAME "Chicken Wars",
 
 #define ENT_RADAR 1 << 12
@@ -131,9 +131,9 @@ public Action NormalSHook(int clients[64], int &numClients, char sample[PLATFORM
 		if (StrContains(sClassname, "_projectile") != -1)
 			return Plugin_Stop;
 	}
-	
 	return Plugin_Continue;
 }
+
 
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {

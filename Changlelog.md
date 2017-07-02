@@ -1,3 +1,6 @@
+* **Version 1.2.2**
+  * Fixed console spam "clamped velocity on..."
+  * Improved taunt sound fidelity
 * **Version 1.2.0**
   * Improved player speed
   * Reduced grenade model change performance impact

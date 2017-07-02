@@ -16,6 +16,8 @@
 *   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sdktools>
+
 #define IDLE "#idle"
 #define PANIC "#panic"
 
@@ -172,14 +174,18 @@ void DropWeapon(int client_index, int slot)
 
 void PlayRandomPanicSound(int client_index)
 {
+	//Channel: 4 | Level: 65 | Volume: 0.899902 | Pitch: 102
+	int pitch = GetRandomInt(90, 110);
 	int rdmSound = GetRandomInt(0, sizeof(chickenPanicSounds) - 1);
-	EmitSoundToAll(chickenPanicSounds[rdmSound], client_index);
+	EmitSoundToAll(chickenPanicSounds[rdmSound], client_index, 4, 65, 0, 0.9, pitch);
 	PrintToConsole(client_index, "Playing panic sound");
 }
 
 void PlayRandomIdleSound(int client_index)
 {
+	//Channel: 4 | Level: 65 | Volume: 0.899902 | Pitch: 94
+	int pitch = GetRandomInt(90, 110);
 	int rdmSound = GetRandomInt(0, sizeof(chickenIdleSounds) - 1);
-	EmitSoundToAll(chickenIdleSounds[rdmSound], client_index);
+	EmitSoundToAll(chickenIdleSounds[rdmSound], client_index, 4, 65, 0, 0.9, pitch);
 	PrintToConsole(client_index, "Playing idle sound");
 }
